@@ -4,9 +4,9 @@ import pandas as pd
 import os
 from utils.paths import IMAGES, CSS
 from utils.messages import obtener_bienvenida
-from components.drama_card import mostrar_tarjeta
 from components.dashboard import mostrar_dashboard
 from components.welcome import mostrar_bienvenida
+from utils.special_dates import obtener_fecha_especial
 from utils.recuerdos import (
     imagen_a_base64,
     obtener_recuerdo_por_indice,
@@ -49,6 +49,28 @@ mostrar_bienvenida(
     saludo,
     mensaje
 )
+
+fecha_especial = obtener_fecha_especial()
+
+if fecha_especial:
+    titulo_fecha, mensaje_fecha = fecha_especial
+
+    st.markdown(
+        f"""
+        <div style="
+            background: rgba(255,255,255,.55);
+            padding: 20px;
+            border-radius: 18px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(255,255,255,.35);
+            backdrop-filter: blur(10px);
+        ">
+            <h3>{titulo_fecha}</h3>
+            <p style="font-size:17px;">{mensaje_fecha}</p>
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
 
 
 # --- MEMORIA DE LA APLICACIÓN (SESSION STATE) ---
