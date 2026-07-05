@@ -1,0 +1,51 @@
+:root {
+    --primary: #7C3AED;
+    --secondary: #A855F7;
+    --background: #0F172A;
+    --card: #1E293B;
+    --text: #F8FAFC;
+    --accent: #C084FC;
+}
+
+[data-testid="stAppViewContainer"] {
+    background: linear-gradient(135deg, #F3E8FF 0%, #E9D5FF 50%, #DDD6FE 100%);
+}
+
+[data-testid="stSidebar"] {
+    background: rgba(255,255,255,0.55);
+    backdrop-filter: blur(12px);
+}
+    h1, h2, h3 { color: #4a044e !important; }
+    
+    /* Animación de rebote al darle clic a las casillas */
+    div[data-testid="stCheckbox"] {
+        transition: transform 0.2s ease-in-out;
+    }
+    div[data-testid="stCheckbox"]:active {
+        transform: scale(0.85); /* Se hace un poquito más chiquito al hacer clic */
+    }
+div[data-testid="stMetric"]{
+    border-radius:18px;
+    padding:12px;
+    background:rgba(255,255,255,.55);
+    backdrop-filter:blur(10px);
+    border:1px solid rgba(255,255,255,.35);
+}
+
+hr{
+    border:none;
+    height:1px;
+    background:rgba(255,255,255,.4);
+}
+
+.stButton>button{
+    border-radius:14px;
+}
+
+div[data-testid="stMetric"]{
+    transition:.25s;
+}
+
+div[data-testid="stMetric"]:hover{
+    transform:translateY(-3px);
+}

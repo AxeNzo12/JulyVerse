@@ -2,50 +2,54 @@ import streamlit as st
 import requests
 import pandas as pd
 import os
-import base64
+from utils.paths import IMAGES, CSS
+from utils.messages import obtener_bienvenida
+from components.drama_card import mostrar_tarjeta
+from components.dashboard import mostrar_dashboard
+from components.welcome import mostrar_bienvenida
+from utils.recuerdos import (
+    imagen_a_base64,
+    obtener_recuerdo_por_indice,
+)
 
-def imagen_a_base64(ruta_archivo):
-    try:
-        with open(ruta_archivo, "rb") as img_file:
-            return base64.b64encode(img_file.read()).decode('utf-8')
-    except:
-        return "" # Si no encuentra la foto, devuelve vacío
-    
-st.set_page_config(page_title="MyJulyPage - KDramas", page_icon="💜", layout="wide")
+
+st.set_page_config(
+    page_title="JulyVerse",
+    page_icon="💜",
+    layout="wide"
+)
 
 # Muestra la notificación animada si hay un mensaje pendiente
 if 'mensaje_toast' in st.session_state:
     st.toast(st.session_state.mensaje_toast, icon="✨")
     del st.session_state.mensaje_toast
 
-# --- PERSONALIZACIÓN: TEMA BTS (CSS CON ANIMACIÓN) ---
-estilos_personalizados = """
-<style>
-    [data-testid="stAppViewContainer"] { background-color: #f3e8ff; }
-    [data-testid="stSidebar"] { background-color: #d8b4e2; }
-    h1, h2, h3 { color: #4a044e !important; }
-    
-    /* Animación de rebote al darle clic a las casillas */
-    div[data-testid="stCheckbox"] {
-        transition: transform 0.2s ease-in-out;
-    }
-    div[data-testid="stCheckbox"]:active {
-        transform: scale(0.85); /* Se hace un poquito más chiquito al hacer clic */
-    }
-</style>
-"""
-st.markdown(estilos_personalizados, unsafe_allow_html=True)
+def cargar_css():
+    with open(CSS / "style.css", encoding="utf-8") as f:
+        st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
+
+cargar_css()
+
 
 # --- MENÚ LATERAL ---
 with st.sidebar:
-    st.title("💜 Para ti")
-    st.write("Tu tracker personal de series.")
+    st.title("🐻 Tata")
+    st.caption("Compañero oficial de JulyVerse 💜")
+    st.write(
+    "Estoy aquí para acompañarte mientras descubres nuevas historias."
+    )
     try:
-        st.image("tata.png", caption="Te amo July 💜")
+        st.image(IMAGES / "ui" / "tata.png")
     except:
         st.info("💡 Guarda una foto como 'taehyung.jpg' en tu carpeta para que aparezca aquí.")
 
-st.title("🎬 MyJulyPage: Catálogo de KDramas")
+saludo, mensaje = obtener_bienvenida()
+
+mostrar_bienvenida(
+    saludo,
+    mensaje
+)
+
 
 # --- MEMORIA DE LA APLICACIÓN (SESSION STATE) ---
 if 'pagina_catalogo' not in st.session_state:
@@ -108,6 +112,9 @@ def actualizar_visto(id_kdrama, titulo, poster, visto):
 
 df_vistos = cargar_vistos()
 lista_vistos_ids = df_vistos['id'].tolist() if not df_vistos.empty else []
+mostrar_dashboard(
+    vistos=len(lista_vistos_ids)
+)
 
 # --- CONSULTAS A TMDB ---
 @st.cache_data 
@@ -143,13 +150,7 @@ def buscar_kdrama(query):
     return requests.get(url, params=parametros).json().get("results", [])
 
 # Lista de tus fotos personalizadas
-IMAGENES_RELLENO = [
-    "july1.jpeg", 
-    "july2.jpeg", 
-    "july3.jpeg", 
-    "july4.jpeg", 
-    "july5.jpeeg"
-]
+
 
 def mostrar_tarjeta(drama, prefijo_key):
     poster_path = drama.get('poster_path') or ''
@@ -161,7 +162,9 @@ def mostrar_tarjeta(drama, prefijo_key):
         # LÓGICA DE ROTACIÓN SEGURA:
         # Si esta serie no tiene foto asignada en la memoria, le damos la siguiente en la lista
         if id_drama not in st.session_state.imagenes_asignadas:
-            foto_elegida = IMAGENES_RELLENO[st.session_state.contador_fotos % len(IMAGENES_RELLENO)]
+            foto_elegida = obtener_recuerdo_por_indice(
+                st.session_state.contador_fotos
+            )
             st.session_state.imagenes_asignadas[id_drama] = foto_elegida
             st.session_state.contador_fotos += 1 # Avanzamos el contador para la próxima serie sin póster
             
@@ -169,16 +172,21 @@ def mostrar_tarjeta(drama, prefijo_key):
         foto_definitiva = st.session_state.imagenes_asignadas[id_drama]
         
         img_b64 = imagen_a_base64(foto_definitiva)
-        url_imagen = f"data:image/jpeg;base64,{img_b64}" if img_b64 else "https://placehold.co/500x750/d8b4e2/4a044e.png?text=Borahae"
+        url_imagen = (
+            f"data:image/jpeg;base64,{img_b64}"
+            if img_b64
+            else "https://placehold.co/500x750/d8b4e2/4a044e.png?text=JulyVerse"
+        )   
 
     # HTML con altura fija de 450px y object-fit: contain
     st.markdown(f'''
         <div style="height: 450px; display: flex; align-items: center; justify-content: center; margin-bottom: 10px;">
-            <img src="{url_imagen}" 
-                 style="max-width: 100%; max-height: 100%; object-fit: contain; border-radius: 8px;">
+            <img src="{url_imagen}"
+                style="max-width: 100%; max-height: 100%; object-fit: contain; border-radius: 8px;">
         </div>
-        ''', unsafe_allow_html=True)
-    
+    ''', unsafe_allow_html=True)
+    if not poster_path:
+        st.caption("💜 No encontré el póster... Pero encontré un bonito recuerdo.")
     titulo = drama.get('name', 'Sin título')
     st.write(f"**{titulo}**")
     
