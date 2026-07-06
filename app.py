@@ -20,6 +20,7 @@ from services.tmdb import (
 from services.storage import (
     cargar_vistos,
     actualizar_visto,
+    actualizar_recuerdo,
 )
 
 st.set_page_config(
@@ -122,9 +123,18 @@ def obtener_key_checkbox(prefijo_key, id_kdrama):
 
 df_vistos = cargar_vistos()
 lista_vistos_ids = df_vistos['id'].tolist() if not df_vistos.empty else []
+
+
+total_recuerdos = 0
+
+if not df_vistos.empty and "recuerdo" in df_vistos.columns:
+    total_recuerdos = df_vistos["recuerdo"].fillna("").astype(str).str.strip().ne("").sum()
+
 mostrar_dashboard(
-    vistos=len(lista_vistos_ids)
+    vistos=len(lista_vistos_ids),
+    recuerdos=total_recuerdos
 )
+
 # --- SISTEMA DE PESTAÑAS (TABS) ---
 tab_catalogo, tab_buscar, tab_lista = st.tabs(["📺 Catálogo", "🔍 Buscar Serie", "✨ Mis KDramas Vistos"])
 
@@ -210,7 +220,25 @@ with tab_lista:
             with col_txt:
                 st.write("") # Espaciador
                 st.write(f"💜 **{row['titulo']}**")
-                
+
+            with st.expander("✨ Guardar recuerdo"):
+                recuerdo_actual = ""
+
+                if "recuerdo" in row and pd.notna(row["recuerdo"]):
+                    recuerdo_actual = str(row["recuerdo"])
+
+                nuevo_recuerdo = st.text_area(
+                    "¿Qué te dejó esta historia?",
+                    value=recuerdo_actual,
+                    key=f"recuerdo_{id_drama_lista}",
+                    placeholder="Escribe aquí tu opinión, emoción o recuerdo..."
+                )
+
+                if st.button("Guardar recuerdo", key=f"guardar_recuerdo_{id_drama_lista}"):
+                    actualizar_recuerdo(id_drama_lista, nuevo_recuerdo)
+                    st.session_state.mensaje_toast = f"Guardaste un recuerdo de '{row['titulo']}' 💜"
+                    st.rerun()
+
             with col_check:
                 st.write("")
 
