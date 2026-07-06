@@ -5,6 +5,7 @@ from utils.messages import obtener_bienvenida
 from components.dashboard import mostrar_dashboard
 from components.welcome import mostrar_bienvenida
 from utils.special_dates import obtener_fecha_especial
+from components.drama_card import mostrar_tarjeta
 from utils.recuerdos import (
     imagen_a_base64,
     obtener_recuerdo_por_indice,
@@ -124,67 +125,6 @@ lista_vistos_ids = df_vistos['id'].tolist() if not df_vistos.empty else []
 mostrar_dashboard(
     vistos=len(lista_vistos_ids)
 )
-
-def mostrar_tarjeta(drama, prefijo_key):
-    poster_path = drama.get('poster_path') or ''
-    id_drama = int(drama["id"])
-
-
-# Lista de tus fotos personalizadas
-
-
-def mostrar_tarjeta(drama, prefijo_key):
-    poster_path = drama.get('poster_path') or ''
-    id_drama = int(drama["id"])
-    
-    if poster_path:
-        url_imagen = IMG_URL + poster_path
-    else:
-        # LÓGICA DE ROTACIÓN SEGURA:
-        # Si esta serie no tiene foto asignada en la memoria, le damos la siguiente en la lista
-        if id_drama not in st.session_state.imagenes_asignadas:
-            foto_elegida = obtener_recuerdo_por_indice(
-                st.session_state.contador_fotos
-            )
-            st.session_state.imagenes_asignadas[id_drama] = foto_elegida
-            st.session_state.contador_fotos += 1 # Avanzamos el contador para la próxima serie sin póster
-            
-        # Recuperamos la foto que se le asignó para que no cambie de golpe al hacer clic
-        foto_definitiva = st.session_state.imagenes_asignadas[id_drama]
-        
-        img_b64 = imagen_a_base64(foto_definitiva)
-        url_imagen = (
-            f"data:image/jpeg;base64,{img_b64}"
-            if img_b64
-            else "https://placehold.co/500x750/d8b4e2/4a044e.png?text=JulyVerse"
-        )   
-
-    # HTML con altura fija de 450px y object-fit: contain
-    st.markdown(f'''
-        <div style="height: 450px; display: flex; align-items: center; justify-content: center; margin-bottom: 10px;">
-            <img src="{url_imagen}"
-                style="max-width: 100%; max-height: 100%; object-fit: contain; border-radius: 8px;">
-        </div>
-    ''', unsafe_allow_html=True)
-    if not poster_path:
-        st.caption("💜 No encontré el póster... Pero encontré un bonito recuerdo.")
-    titulo = drama.get('name', 'Sin título')
-    st.write(f"**{titulo}**")
-    
-    ya_visto = id_drama in lista_vistos_ids
-    key_checkbox = obtener_key_checkbox(prefijo_key, id_drama)
-
-    visto_ahora = st.checkbox(
-        "Ya lo vi",
-        value=ya_visto,
-        key=key_checkbox
-    )
-    
-    if visto_ahora != ya_visto:
-        actualizar_visto(id_drama, titulo, poster_path, visto_ahora)
-        if visto_ahora:
-            st.session_state.mensaje_toast = f"¡Guardaste '{titulo}' en tu lista! 💜"
-        st.rerun()
 # --- SISTEMA DE PESTAÑAS (TABS) ---
 tab_catalogo, tab_buscar, tab_lista = st.tabs(["📺 Catálogo", "🔍 Buscar Serie", "✨ Mis KDramas Vistos"])
 
@@ -210,7 +150,7 @@ with tab_catalogo:
     columnas = st.columns(4) 
     for indice, drama in enumerate(kdramas):
         with columnas[indice % 4]:
-            mostrar_tarjeta(drama, "cat")
+            mostrar_tarjeta(drama, "cat", lista_vistos_ids)
             
     st.divider()
     
@@ -246,7 +186,7 @@ with tab_buscar:
         cols_busqueda = st.columns(4)
         for idx, res in enumerate(st.session_state.resultados_busqueda):
             with cols_busqueda[idx % 4]:
-                mostrar_tarjeta(res, "bus")
+                mostrar_tarjeta(res, "bus", lista_vistos_ids)
     elif not st.session_state.resultados_busqueda and "busqueda" in locals() and busqueda:
         st.info("No se encontraron resultados.")
 
