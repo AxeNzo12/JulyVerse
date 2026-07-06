@@ -21,7 +21,7 @@ from services.tmdb import (
 from services.storage import (
     cargar_vistos,
     actualizar_visto,
-    actualizar_recuerdo,
+    actualizar_favorito,
 )
 from components.achievements import (
     calcular_logros,
@@ -139,14 +139,20 @@ logros_desbloqueados = calcular_logros(
     total_vistos=len(lista_vistos_ids),
     total_recuerdos=total_recuerdos
 )
+total_favoritos = 0
+
+if not df_vistos.empty and "favorito" in df_vistos.columns:
+    total_favoritos = df_vistos["favorito"].sum()
 
 mostrar_dashboard(
     vistos=len(lista_vistos_ids),
     recuerdos=total_recuerdos,
+    favoritos=total_favoritos,
     logros=len(logros_desbloqueados)
 )
 
 mostrar_logros(logros_desbloqueados)
+
 
 # --- SISTEMA DE PESTAÑAS (TABS) ---
 tab_catalogo, tab_buscar, tab_lista = st.tabs(["📺 Catálogo", "🔍 Buscar Serie", "✨ Mis KDramas Vistos"])
@@ -231,8 +237,30 @@ with tab_lista:
                     st.image(IMG_URL_SMALL + row['poster'], width=60)
             
             with col_txt:
-                st.write("") # Espaciador
+                st.write("")
                 st.write(f"💜 **{row['titulo']}**")
+
+                favorito_actual = False
+
+                if "favorito" in row and pd.notna(row["favorito"]):
+                    favorito_actual = bool(row["favorito"])
+
+                favorito_nuevo = st.checkbox(
+                    "⭐ Favorito",
+                    value=favorito_actual,
+                    key=f"favorito_{id_drama_lista}"
+                )
+
+                if favorito_nuevo != favorito_actual:
+                    actualizar_favorito(id_drama_lista, favorito_nuevo)
+
+                    if favorito_nuevo:
+                        st.session_state.mensaje_toast = f"Agregaste '{row['titulo']}' a favoritos ⭐"
+                    else:
+                        st.session_state.mensaje_toast = f"Quitaste '{row['titulo']}' de favoritos."
+
+                    st.rerun()
+
                 mostrar_caja_recuerdo(row, id_drama_lista)
 
             with col_check:

@@ -15,6 +15,16 @@ def cargar_vistos():
             df["recuerdo"] = ""
 
         df["recuerdo"] = df["recuerdo"].fillna("").astype(str)
+        if "favorito" not in df.columns:
+            df["favorito"] = False
+
+        df["favorito"] = (
+            df["favorito"]
+            .fillna(False)
+            .astype(str)
+            .str.lower()
+            .isin(["true", "1", "yes", "si", "sí"])
+        )
         if not df.empty:
             df["id"] = pd.to_numeric(df["id"], errors="coerce")
             df = df.dropna(subset=["id"])
@@ -22,7 +32,7 @@ def cargar_vistos():
 
         return df
 
-    return pd.DataFrame(columns=["id", "titulo", "poster", "recuerdo"])
+    return pd.DataFrame(columns=["id", "titulo", "poster", "recuerdo", "favorito"])
 
 
 def actualizar_visto(id_kdrama, titulo, poster, visto):
@@ -36,16 +46,16 @@ def actualizar_visto(id_kdrama, titulo, poster, visto):
                 "id": [id_kdrama],
                 "titulo": [titulo],
                 "poster": [poster],
-                "recuerdo": [""]
+                "recuerdo": [""],
+                "favorito": [False]
             })
-
             df = pd.concat([df, nuevo_registro], ignore_index=True)
 
     else:
         df = df[df["id"] != id_kdrama]
 
         if df.empty:
-            df = pd.DataFrame(columns=["id", "titulo", "poster", "recuerdo"])
+            df = pd.DataFrame(columns=["id", "titulo", "poster", "recuerdo", "favorito"])
 
     df.to_csv(ARCHIVO_CSV, index=False)
 
@@ -65,4 +75,18 @@ def actualizar_recuerdo(id_kdrama, recuerdo):
 
     df.loc[df["id"] == id_kdrama, "recuerdo"] = recuerdo
     
+    df.to_csv(ARCHIVO_CSV, index=False)
+
+def actualizar_favorito(id_kdrama, favorito):
+    df = cargar_vistos()
+
+    id_kdrama = int(float(id_kdrama))
+
+    if not df.empty:
+        df["id"] = pd.to_numeric(df["id"], errors="coerce")
+        df = df.dropna(subset=["id"])
+        df["id"] = df["id"].astype(int)
+
+    df.loc[df["id"] == id_kdrama, "favorito"] = bool(favorito)
+
     df.to_csv(ARCHIVO_CSV, index=False)
