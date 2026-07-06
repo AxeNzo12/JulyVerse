@@ -7,6 +7,7 @@ from components.welcome import mostrar_bienvenida
 from utils.special_dates import obtener_fecha_especial
 from components.drama_card import mostrar_tarjeta
 from components.memory_box import mostrar_caja_recuerdo
+from components.favorite_card import mostrar_favorito
 from utils.recuerdos import (
     imagen_a_base64,
     obtener_recuerdo_por_indice,
@@ -304,6 +305,7 @@ with tab_lista:
         st.info("Aún no has marcado ningún KDrama como visto. ¡Explora el catálogo o usa el buscador!")
 
 # PESTAÑA 4: FAVORITOS
+# PESTAÑA 4: FAVORITOS
 with tab_favoritos:
     st.subheader("⭐ Tus KDramas favoritos")
 
@@ -313,34 +315,17 @@ with tab_favoritos:
         df_favoritos = df_favoritos[df_favoritos["favorito"] == True]
 
     if not df_favoritos.empty:
+        columnas_favoritos = st.columns(3)
+
         for i, row in df_favoritos.iterrows():
             id_drama_favorito = int(row["id"])
 
-            col_img, col_txt, col_btn = st.columns([1, 8, 2])
-
-            with col_img:
-                if pd.notna(row["poster"]) and row["poster"]:
-                    st.image(IMG_URL_SMALL + row["poster"], width=60)
-
-            with col_txt:
-                st.write("")
-                st.write(f"⭐ **{row['titulo']}**")
-
-                if "recuerdo" in row and pd.notna(row["recuerdo"]) and str(row["recuerdo"]).strip():
-                    st.caption(f"💜 {row['recuerdo']}")
-
-            with col_btn:
-                st.write("")
-
-                if st.button("Quitar favorito", key=f"quitar_fav_{id_drama_favorito}", use_container_width=True):
-                    actualizar_favorito(id_drama_favorito, False)
-
-                    limpiar_estado_favorito(id_drama_favorito)
-
-                    st.session_state.mensaje_toast = f"Quitaste '{row['titulo']}' de favoritos."
-                    st.rerun()
-
-            st.divider()
+            with columnas_favoritos[i % 3]:
+                mostrar_favorito(
+                    row,
+                    id_drama_favorito,
+                    limpiar_estado_favorito
+                )
 
     else:
         st.info("Aún no has marcado ningún KDrama como favorito.")

@@ -49,3 +49,51 @@ div[data-testid="stMetric"]{
 div[data-testid="stMetric"]:hover{
     transform:translateY(-3px);
 }
+.favorite-card {
+    background: rgba(255, 255, 255, 0.45);
+    border: 1px solid rgba(255, 255, 255, 0.35);
+    border-radius: 22px;
+    padding: 16px;
+    margin-bottom: 12px;
+    backdrop-filter: blur(10px);
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.favorite-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 30px rgba(124, 58, 237, 0.18);
+}
+
+.favorite-poster-wrapper {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    margin-bottom: 14px;
+}
+
+.favorite-poster {
+    width: 150px;
+    height: 225px;
+    object-fit: cover;
+    border-radius: 16px;
+    box-shadow: 0 10px 22px rgba(0, 0, 0, 0.18);
+}
+
+.favorite-info {
+    text-align: center;
+}
+
+.favorite-title {
+    color: #4a044e;
+    font-size: 18px;
+    font-weight: 700;
+    line-height: 1.25;
+    margin-bottom: 8px;
+}
+
+.favorite-memory {
+    color: #6b4e71;
+    font-size: 14px;
+    line-height: 1.35;
+    margin-top: 6px;
+}
