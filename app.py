@@ -6,6 +6,7 @@ from components.dashboard import mostrar_dashboard
 from components.welcome import mostrar_bienvenida
 from utils.special_dates import obtener_fecha_especial
 from components.drama_card import mostrar_tarjeta
+from components.memory_box import mostrar_caja_recuerdo
 from utils.recuerdos import (
     imagen_a_base64,
     obtener_recuerdo_por_indice,
@@ -220,24 +221,7 @@ with tab_lista:
             with col_txt:
                 st.write("") # Espaciador
                 st.write(f"💜 **{row['titulo']}**")
-
-            with st.expander("✨ Guardar recuerdo"):
-                recuerdo_actual = ""
-
-                if "recuerdo" in row and pd.notna(row["recuerdo"]):
-                    recuerdo_actual = str(row["recuerdo"])
-
-                nuevo_recuerdo = st.text_area(
-                    "¿Qué te dejó esta historia?",
-                    value=recuerdo_actual,
-                    key=f"recuerdo_{id_drama_lista}",
-                    placeholder="Escribe aquí tu opinión, emoción o recuerdo..."
-                )
-
-                if st.button("Guardar recuerdo", key=f"guardar_recuerdo_{id_drama_lista}"):
-                    actualizar_recuerdo(id_drama_lista, nuevo_recuerdo)
-                    st.session_state.mensaje_toast = f"Guardaste un recuerdo de '{row['titulo']}' 💜"
-                    st.rerun()
+                mostrar_caja_recuerdo(row, id_drama_lista)
 
             with col_check:
                 st.write("")
