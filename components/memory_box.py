@@ -37,7 +37,7 @@ def mostrar_caja_recuerdo(row, id_drama_lista):
 
             if texto_key in st.session_state:
                 del st.session_state[texto_key]
-            st.session_state.pagina_actual = "✨ Mis KDramas Vistos"
+            st.session_state.pagina_pendiente = "✨ Mis KDramas Vistos"
             st.rerun()
 
         return
@@ -63,7 +63,7 @@ def mostrar_caja_recuerdo(row, id_drama_lista):
 
                 if texto_key in st.session_state:
                     del st.session_state[texto_key]
-
+                st.session_state.pagina_pendiente = "✨ Mis KDramas Vistos"
                 st.rerun()
 
         with col_cancelar:
@@ -72,7 +72,7 @@ def mostrar_caja_recuerdo(row, id_drama_lista):
 
                 if texto_key in st.session_state:
                     del st.session_state[texto_key]
-
+                st.session_state.pagina_pendiente = "✨ Mis KDramas Vistos"
                 st.rerun()
 
         return
@@ -103,5 +103,5 @@ def mostrar_caja_recuerdo(row, id_drama_lista):
 
         if texto_key in st.session_state:
             del st.session_state[texto_key]
-
+        st.session_state.pagina_pendiente = "✨ Mis KDramas Vistos"
         st.rerun()
