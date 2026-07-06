@@ -47,4 +47,6 @@ def mostrar_favorito(row, id_drama_favorito, limpiar_estado_favorito):
         limpiar_estado_favorito(id_drama_favorito)
 
         st.session_state.mensaje_toast = f"Quitaste '{titulo}' de favoritos."
+
+        st.session_state.pagina_pendiente = "⭐ Favoritos"
         st.rerun()

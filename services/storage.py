@@ -25,6 +25,15 @@ def cargar_vistos():
             .str.lower()
             .isin(["true", "1", "yes", "si", "sí"])
         )
+        if "calificacion" not in df.columns:
+            df["calificacion"] = 0
+
+        df["calificacion"] = (
+            pd.to_numeric(df["calificacion"], errors="coerce")
+            .fillna(0)
+            .astype(int)
+        )
+
         if not df.empty:
             df["id"] = pd.to_numeric(df["id"], errors="coerce")
             df = df.dropna(subset=["id"])
@@ -32,7 +41,7 @@ def cargar_vistos():
 
         return df
 
-    return pd.DataFrame(columns=["id", "titulo", "poster", "recuerdo", "favorito"])
+    return pd.DataFrame(columns=["id", "titulo", "poster", "recuerdo", "favorito", "calificacion"])
 
 
 def actualizar_visto(id_kdrama, titulo, poster, visto):
@@ -47,7 +56,8 @@ def actualizar_visto(id_kdrama, titulo, poster, visto):
                 "titulo": [titulo],
                 "poster": [poster],
                 "recuerdo": [""],
-                "favorito": [False]
+                "favorito": [False],
+                "calificacion": [0]
             })
             df = pd.concat([df, nuevo_registro], ignore_index=True)
 
@@ -55,7 +65,7 @@ def actualizar_visto(id_kdrama, titulo, poster, visto):
         df = df[df["id"] != id_kdrama]
 
         if df.empty:
-            df = pd.DataFrame(columns=["id", "titulo", "poster", "recuerdo", "favorito"])
+            df = pd.DataFrame(columns=["id", "titulo", "poster", "recuerdo", "favorito", "calificacion"])
 
     df.to_csv(ARCHIVO_CSV, index=False)
 
@@ -88,5 +98,20 @@ def actualizar_favorito(id_kdrama, favorito):
         df["id"] = df["id"].astype(int)
 
     df.loc[df["id"] == id_kdrama, "favorito"] = bool(favorito)
+
+    df.to_csv(ARCHIVO_CSV, index=False)
+    
+def actualizar_calificacion(id_kdrama, calificacion):
+    df = cargar_vistos()
+
+    id_kdrama = int(float(id_kdrama))
+    calificacion = int(calificacion)
+
+    if not df.empty:
+        df["id"] = pd.to_numeric(df["id"], errors="coerce")
+        df = df.dropna(subset=["id"])
+        df["id"] = df["id"].astype(int)
+
+    df.loc[df["id"] == id_kdrama, "calificacion"] = calificacion
 
     df.to_csv(ARCHIVO_CSV, index=False)

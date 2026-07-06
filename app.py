@@ -23,6 +23,7 @@ from services.storage import (
     cargar_vistos,
     actualizar_visto,
     actualizar_favorito,
+    actualizar_calificacion,
 )
 from components.achievements import (
     calcular_logros,
@@ -171,16 +172,31 @@ mostrar_dashboard(
 mostrar_logros(logros_desbloqueados)
 
 
-# --- SISTEMA DE PESTAÑAS (TABS) ---
-tab_catalogo, tab_buscar, tab_lista, tab_favoritos = st.tabs([
+OPCIONES_PAGINA = [
     "📺 Catálogo",
     "🔍 Buscar Serie",
     "✨ Mis KDramas Vistos",
     "⭐ Favoritos"
-])
+]
+
+if "pagina_actual" not in st.session_state:
+    st.session_state.pagina_actual = "📺 Catálogo"
+
+# Si alguna acción pidió cambiar de página, lo hacemos ANTES de crear el radio
+if "pagina_pendiente" in st.session_state:
+    st.session_state.pagina_actual = st.session_state.pagina_pendiente
+    del st.session_state.pagina_pendiente
+
+pagina_actual = st.radio(
+    "Navegación",
+    OPCIONES_PAGINA,
+    horizontal=True,
+    key="pagina_actual",
+    label_visibility="collapsed"
+)
 
 # PESTAÑA 1: CATÁLOGO POPULAR
-with tab_catalogo:
+if pagina_actual == "📺 Catálogo":
     col_titulo, col_filtro = st.columns([2, 1])
     with col_titulo:
         st.subheader("Lo más popular del momento")
@@ -213,7 +229,7 @@ with tab_catalogo:
             st.rerun()
 # PESTAÑA 2: BUSCADOR
 # PESTAÑA 2: BUSCADOR MEJORADO (CON FORMULARIO)
-with tab_buscar:
+if pagina_actual == "🔍 Buscar Serie":
     st.subheader("Encuentra una serie específica")
     
     # Creamos un formulario que agrupa la caja de texto y el botón
@@ -242,7 +258,7 @@ with tab_buscar:
         st.info("No se encontraron resultados.")
 
 # PESTAÑA 3: LISTA PERSONAL CON MINIATURAS Y BOTÓN PARA QUITAR
-with tab_lista:
+if pagina_actual == "✨ Mis KDramas Vistos":
     st.subheader("Tu historial de series terminadas")
     
     # Recargamos los datos para tener la información fresca
@@ -283,30 +299,66 @@ with tab_lista:
                     else:
                         st.session_state.mensaje_toast = f"Quitaste '{row['titulo']}' de favoritos."
 
+                    st.session_state.pagina_pendiente = "✨ Mis KDramas Vistos"
                     st.rerun()
 
-                mostrar_caja_recuerdo(row, id_drama_lista)
+                # --- CALIFICACIÓN PERSONAL ---
+                calificacion_actual = 0
 
-            with col_check:
-                st.write("")
+                if "calificacion" in row and pd.notna(row["calificacion"]):
+                    calificacion_actual = int(row["calificacion"])
 
-                if st.button("Quitar", key=f"btn_quitar_{id_drama_lista}", use_container_width=True):
-                    actualizar_visto(id_drama_lista, row["titulo"], row["poster"], False)
+                opciones_calificacion = ["Sin calificar"] + [str(i) for i in range(1, 11)]
 
-                    limpiar_estado_drama(id_drama_lista)
+                indice_calificacion = 0
 
-                    st.session_state.resultados_busqueda = []
-                    st.session_state.mensaje_toast = f"Quitaste '{row['titulo']}' de tu lista."
+                if calificacion_actual > 0:
+                    indice_calificacion = calificacion_actual
 
-                    st.rerun()
-                                    
+                calificacion_seleccionada = st.selectbox(
+                    "⭐ Calificación",
+                    options=opciones_calificacion,
+                    index=indice_calificacion,
+                    key=f"calificacion_{id_drama_lista}"
+                )
+
+                nueva_calificacion = (
+                    0
+                    if calificacion_seleccionada == "Sin calificar"
+                    else int(calificacion_seleccionada)
+                )
+
+                if nueva_calificacion != calificacion_actual:
+                    actualizar_calificacion(id_drama_lista, nueva_calificacion)
+
+                    if nueva_calificacion > 0:
+                        st.session_state.mensaje_toast = f"Calificaste '{row['titulo']}' con {nueva_calificacion}/10 ⭐"
+                    else:
+                        st.session_state.mensaje_toast = f"Quitaste la calificación de '{row['titulo']}'."
+
+                    st.session_state.pagina_pendiente = "✨ Mis KDramas Vistos"
+                    st.rerun()      
+
+    mostrar_caja_recuerdo(row, id_drama_lista)  
+
+    with col_check:
+        st.write("")
+        if st.button("Quitar", key=f"btn_quitar_{id_drama_lista}", use_container_width=True):
+            actualizar_visto(id_drama_lista, row["titulo"], row["poster"], False)
+
+            limpiar_estado_drama(id_drama_lista)
+
+            st.session_state.resultados_busqueda = []
+            st.session_state.mensaje_toast = f"Quitaste '{row['titulo']}' de tu lista."
+
+            st.session_state.pagina_pendiente = "✨ Mis KDramas Vistos"
+            st.rerun()                      
             st.divider() # Línea de separación
-    else:
-        st.info("Aún no has marcado ningún KDrama como visto. ¡Explora el catálogo o usa el buscador!")
+        else:
+            st.info("Aún no has marcado ningún KDrama como visto. ¡Explora el catálogo o usa el buscador!")
 
 # PESTAÑA 4: FAVORITOS
-# PESTAÑA 4: FAVORITOS
-with tab_favoritos:
+if pagina_actual == "⭐ Favoritos":
     st.subheader("⭐ Tus KDramas favoritos")
 
     df_favoritos = cargar_vistos()
