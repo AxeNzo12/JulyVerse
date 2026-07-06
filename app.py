@@ -43,7 +43,10 @@ with st.sidebar:
     except:
         st.info("💡 Guarda una foto como 'taehyung.jpg' en tu carpeta para que aparezca aquí.")
 
-saludo, mensaje = obtener_bienvenida()
+if "bienvenida_actual" not in st.session_state:
+    st.session_state.bienvenida_actual = obtener_bienvenida()
+
+saludo, mensaje = st.session_state.bienvenida_actual
 
 mostrar_bienvenida(
     saludo,
@@ -122,15 +125,49 @@ def cargar_vistos():
     return pd.DataFrame(columns=["id", "titulo", "poster"])
 def actualizar_visto(id_kdrama, titulo, poster, visto):
     df = cargar_vistos()
-    
+
+    # Aseguramos que el ID siempre sea número
+    id_kdrama = int(id_kdrama)
+
+    if not df.empty:
+        df["id"] = pd.to_numeric(df["id"], errors="coerce")
+        df = df.dropna(subset=["id"])
+        df["id"] = df["id"].astype(int)
+
     if visto:
-        if id_kdrama not in df['id'].values:
-            nuevo_registro = pd.DataFrame({"id": [id_kdrama], "titulo": [titulo], "poster": [poster]})
+        if id_kdrama not in df["id"].values:
+            nuevo_registro = pd.DataFrame({
+                "id": [id_kdrama],
+                "titulo": [titulo],
+                "poster": [poster]
+            })
+
             df = pd.concat([df, nuevo_registro], ignore_index=True)
+
     else:
-        df = df[df['id'] != id_kdrama]
-    
+        df = df[df["id"] != id_kdrama]
+
+        # Si ya no queda ningún KDrama, dejamos el CSV vacío pero con columnas
+        if df.empty:
+            df = pd.DataFrame(columns=["id", "titulo", "poster"])
+
     df.to_csv(ARCHIVO_CSV, index=False)
+def limpiar_estado_drama(id_kdrama):
+    id_kdrama = int(float(id_kdrama))
+
+    version_key = f"version_drama_{id_kdrama}"
+
+    if version_key not in st.session_state:
+        st.session_state[version_key] = 0
+
+    st.session_state[version_key] += 1
+
+def obtener_key_checkbox(prefijo_key, id_kdrama):
+    id_kdrama = int(float(id_kdrama))
+    version = st.session_state.get(f"version_drama_{id_kdrama}", 0)
+
+    return f"{prefijo_key}_{id_kdrama}_{version}"
+
 
 df_vistos = cargar_vistos()
 lista_vistos_ids = df_vistos['id'].tolist() if not df_vistos.empty else []
@@ -139,44 +176,64 @@ mostrar_dashboard(
 )
 
 # --- CONSULTAS A TMDB ---
-@st.cache_data 
+@st.cache_data(show_spinner=False)
 def obtener_kdramas_populares(limite_paginas, id_genero):
     resultados_totales = []
-    # Un ciclo para pedir la página 1, luego la 2, luego la 3, etc.
+
     for p in range(1, limite_paginas + 1):
         url = f"{BASE_URL}/discover/tv"
+
         parametros = {
             "api_key": API_KEY,
-            "with_origin_country": "KR", 
+            "with_origin_country": "KR",
             "sort_by": "popularity.desc",
-            "language": "es-MX", 
-            "page": p 
+            "language": "es-MX",
+            "page": p
         }
-        # Si seleccionó un género específico, lo agregamos a la petición
+
         if id_genero:
             parametros["with_genres"] = id_genero
-            
-        respuesta = requests.get(url, params=parametros)
-        resultados_totales.extend(respuesta.json().get("results", []))
-        
+
+        try:
+            respuesta = requests.get(url, params=parametros, timeout=10)
+            respuesta.raise_for_status()
+
+            datos = respuesta.json()
+            resultados_totales.extend(datos.get("results", []))
+
+        except requests.exceptions.RequestException as error:
+            st.error("No pude conectar con TMDB. Revisa tu internet o intenta de nuevo en unos minutos.")
+            st.caption(f"Detalle técnico: {error}")
+            return []
+
     return resultados_totales
 
 def buscar_kdrama(query):
     url = f"{BASE_URL}/search/tv"
+
     parametros = {
         "api_key": API_KEY,
         "query": query,
         "language": "es-MX"
     }
-    # Ahora devolvemos todos los resultados directos de la API, sin importar el país de origen
-    return requests.get(url, params=parametros).json().get("results", [])
+
+    try:
+        respuesta = requests.get(url, params=parametros, timeout=10)
+        respuesta.raise_for_status()
+
+        return respuesta.json().get("results", [])
+
+    except requests.exceptions.RequestException as error:
+        st.error("No pude realizar la búsqueda en TMDB. Intenta de nuevo en unos minutos.")
+        st.caption(f"Detalle técnico: {error}")
+        return []
 
 # Lista de tus fotos personalizadas
 
 
 def mostrar_tarjeta(drama, prefijo_key):
     poster_path = drama.get('poster_path') or ''
-    id_drama = drama['id']
+    id_drama = int(drama["id"])
     
     if poster_path:
         url_imagen = IMG_URL + poster_path
@@ -213,7 +270,13 @@ def mostrar_tarjeta(drama, prefijo_key):
     st.write(f"**{titulo}**")
     
     ya_visto = id_drama in lista_vistos_ids
-    visto_ahora = st.checkbox("Ya lo vi", value=ya_visto, key=f"{prefijo_key}_{id_drama}")
+    key_checkbox = obtener_key_checkbox(prefijo_key, id_drama)
+
+    visto_ahora = st.checkbox(
+        "Ya lo vi",
+        value=ya_visto,
+        key=key_checkbox
+    )
     
     if visto_ahora != ya_visto:
         actualizar_visto(id_drama, titulo, poster_path, visto_ahora)
@@ -295,6 +358,7 @@ with tab_lista:
     if not df_vistos_actualizado.empty:
         for i, row in df_vistos_actualizado.iterrows():
             # Dividimos en 3 espacios: Imagen, Texto, Casilla
+            id_drama_lista = int(row["id"])
             col_img, col_txt, col_check = st.columns([1, 8, 2])
             
             with col_img:
@@ -306,17 +370,18 @@ with tab_lista:
                 st.write(f"💜 **{row['titulo']}**")
                 
             with col_check:
-                st.write("") # Espaciador
-                # Casilla que por defecto está marcada. Si la desmarca, se borra.
-                mantener = st.checkbox("Ya lo vi", value=True, key=f"quitar_{row['id']}")
-                if not mantener:
-                    actualizar_visto(row['id'], row['titulo'], row['poster'], False)
-                    
-                    # --- NUEVO: Limpiamos la memoria de búsqueda para que se refresque ---
+                st.write("")
+
+                if st.button("Quitar", key=f"btn_quitar_{id_drama_lista}", use_container_width=True):
+                    actualizar_visto(id_drama_lista, row["titulo"], row["poster"], False)
+
+                    limpiar_estado_drama(id_drama_lista)
+
                     st.session_state.resultados_busqueda = []
-                    
-                    st.rerun()  
-                    
+                    st.session_state.mensaje_toast = f"Quitaste '{row['titulo']}' de tu lista."
+
+                    st.rerun()
+                                    
             st.divider() # Línea de separación
     else:
         st.info("Aún no has marcado ningún KDrama como visto. ¡Explora el catálogo o usa el buscador!")
