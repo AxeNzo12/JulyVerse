@@ -1,5 +1,4 @@
 import streamlit as st
-import requests
 import pandas as pd
 import os
 from utils.paths import IMAGES, CSS
@@ -11,7 +10,13 @@ from utils.recuerdos import (
     imagen_a_base64,
     obtener_recuerdo_por_indice,
 )
-
+from services.tmdb import (
+    GENEROS_TMDB,
+    IMG_URL,
+    IMG_URL_SMALL,
+    obtener_kdramas_populares,
+    buscar_kdrama,
+)
 
 st.set_page_config(
     page_title="JulyVerse",
@@ -93,22 +98,7 @@ def reset_pagina():
     # Si ella cambia de género, regresamos a la página 1
     st.session_state.pagina_catalogo = 1
 
-# Códigos oficiales de géneros de TV en TMDB
-GENEROS_TMDB = {
-    "Todos": "",
-    "Drama / Romance": "18",
-    "Comedia": "35",
-    "Acción y Aventura": "10759",
-    "Misterio": "9648",
-    "Fantasía / Sci-Fi": "10765",
-    "Crimen": "80"
-}
 
-# --- CONFIGURACIÓN DE LA API ---
-API_KEY = st.secrets["TMDB_API_KEY"]
-BASE_URL = "https://api.themoviedb.org/3"
-IMG_URL = "https://image.tmdb.org/t/p/w500"
-IMG_URL_SMALL = "https://image.tmdb.org/t/p/w200" # URL para las miniaturas
 ARCHIVO_CSV = "mis_kdramas.csv"
 
 # --- MANEJO DE DATOS ---
@@ -177,36 +167,6 @@ mostrar_dashboard(
 
 # --- CONSULTAS A TMDB ---
 @st.cache_data(show_spinner=False)
-def obtener_kdramas_populares(limite_paginas, id_genero):
-    resultados_totales = []
-
-    for p in range(1, limite_paginas + 1):
-        url = f"{BASE_URL}/discover/tv"
-
-        parametros = {
-            "api_key": API_KEY,
-            "with_origin_country": "KR",
-            "sort_by": "popularity.desc",
-            "language": "es-MX",
-            "page": p
-        }
-
-        if id_genero:
-            parametros["with_genres"] = id_genero
-
-        try:
-            respuesta = requests.get(url, params=parametros, timeout=10)
-            respuesta.raise_for_status()
-
-            datos = respuesta.json()
-            resultados_totales.extend(datos.get("results", []))
-
-        except requests.exceptions.RequestException as error:
-            st.error("No pude conectar con TMDB. Revisa tu internet o intenta de nuevo en unos minutos.")
-            st.caption(f"Detalle técnico: {error}")
-            return []
-
-    return resultados_totales
 
 def buscar_kdrama(query):
     url = f"{BASE_URL}/search/tv"
