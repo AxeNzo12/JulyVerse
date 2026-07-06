@@ -1,6 +1,5 @@
 import streamlit as st
 import pandas as pd
-import os
 from utils.paths import IMAGES, CSS
 from utils.messages import obtener_bienvenida
 from components.dashboard import mostrar_dashboard
@@ -16,6 +15,10 @@ from services.tmdb import (
     IMG_URL_SMALL,
     obtener_kdramas_populares,
     buscar_kdrama,
+)
+from services.storage import (
+    cargar_vistos,
+    actualizar_visto,
 )
 
 st.set_page_config(
@@ -99,49 +102,6 @@ def reset_pagina():
     st.session_state.pagina_catalogo = 1
 
 
-ARCHIVO_CSV = "mis_kdramas.csv"
-
-# --- MANEJO DE DATOS ---
-def cargar_vistos():
-    if os.path.exists(ARCHIVO_CSV):
-        df = pd.read_csv(ARCHIVO_CSV)
-        # Parche de seguridad: si el archivo existe pero es la versión vieja,
-        # le agrega la columna 'poster' vacía automáticamente para que no falle.
-        if 'poster' not in df.columns:
-            df['poster'] = ""
-        return df
-    
-    # Si de plano no existe, crea la estructura desde cero con las 3 columnas
-    return pd.DataFrame(columns=["id", "titulo", "poster"])
-def actualizar_visto(id_kdrama, titulo, poster, visto):
-    df = cargar_vistos()
-
-    # Aseguramos que el ID siempre sea número
-    id_kdrama = int(id_kdrama)
-
-    if not df.empty:
-        df["id"] = pd.to_numeric(df["id"], errors="coerce")
-        df = df.dropna(subset=["id"])
-        df["id"] = df["id"].astype(int)
-
-    if visto:
-        if id_kdrama not in df["id"].values:
-            nuevo_registro = pd.DataFrame({
-                "id": [id_kdrama],
-                "titulo": [titulo],
-                "poster": [poster]
-            })
-
-            df = pd.concat([df, nuevo_registro], ignore_index=True)
-
-    else:
-        df = df[df["id"] != id_kdrama]
-
-        # Si ya no queda ningún KDrama, dejamos el CSV vacío pero con columnas
-        if df.empty:
-            df = pd.DataFrame(columns=["id", "titulo", "poster"])
-
-    df.to_csv(ARCHIVO_CSV, index=False)
 def limpiar_estado_drama(id_kdrama):
     id_kdrama = int(float(id_kdrama))
 
@@ -165,28 +125,10 @@ mostrar_dashboard(
     vistos=len(lista_vistos_ids)
 )
 
-# --- CONSULTAS A TMDB ---
-@st.cache_data(show_spinner=False)
+def mostrar_tarjeta(drama, prefijo_key):
+    poster_path = drama.get('poster_path') or ''
+    id_drama = int(drama["id"])
 
-def buscar_kdrama(query):
-    url = f"{BASE_URL}/search/tv"
-
-    parametros = {
-        "api_key": API_KEY,
-        "query": query,
-        "language": "es-MX"
-    }
-
-    try:
-        respuesta = requests.get(url, params=parametros, timeout=10)
-        respuesta.raise_for_status()
-
-        return respuesta.json().get("results", [])
-
-    except requests.exceptions.RequestException as error:
-        st.error("No pude realizar la búsqueda en TMDB. Intenta de nuevo en unos minutos.")
-        st.caption(f"Detalle técnico: {error}")
-        return []
 
 # Lista de tus fotos personalizadas
 
