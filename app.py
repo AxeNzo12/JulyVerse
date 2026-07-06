@@ -23,6 +23,10 @@ from services.storage import (
     actualizar_visto,
     actualizar_recuerdo,
 )
+from components.achievements import (
+    calcular_logros,
+    mostrar_logros,
+)
 
 st.set_page_config(
     page_title="JulyVerse",
@@ -131,10 +135,18 @@ total_recuerdos = 0
 if not df_vistos.empty and "recuerdo" in df_vistos.columns:
     total_recuerdos = df_vistos["recuerdo"].fillna("").astype(str).str.strip().ne("").sum()
 
+logros_desbloqueados = calcular_logros(
+    total_vistos=len(lista_vistos_ids),
+    total_recuerdos=total_recuerdos
+)
+
 mostrar_dashboard(
     vistos=len(lista_vistos_ids),
-    recuerdos=total_recuerdos
+    recuerdos=total_recuerdos,
+    logros=len(logros_desbloqueados)
 )
+
+mostrar_logros(logros_desbloqueados)
 
 # --- SISTEMA DE PESTAÑAS (TABS) ---
 tab_catalogo, tab_buscar, tab_lista = st.tabs(["📺 Catálogo", "🔍 Buscar Serie", "✨ Mis KDramas Vistos"])
