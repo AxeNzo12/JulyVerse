@@ -228,4 +228,11 @@ div[data-testid="stCheckbox"] {
 
 div[data-testid="stCheckbox"]:active {
     transform: scale(0.95);
-}   
+}  
+
+.favorite-rating {
+    color: #7C3AED;
+    font-size: 15px;
+    font-weight: 700;
+    margin-bottom: 6px;
+}

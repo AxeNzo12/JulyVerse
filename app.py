@@ -162,11 +162,20 @@ total_favoritos = 0
 if not df_vistos.empty and "favorito" in df_vistos.columns:
     total_favoritos = df_vistos["favorito"].sum()
 
+promedio_calificacion = 0
+
+if not df_vistos.empty and "calificacion" in df_vistos.columns:
+    calificaciones_validas = df_vistos[df_vistos["calificacion"] > 0]["calificacion"]
+
+    if not calificaciones_validas.empty:
+        promedio_calificacion = round(calificaciones_validas.mean(), 1)
+
 mostrar_dashboard(
     vistos=len(lista_vistos_ids),
     recuerdos=total_recuerdos,
     favoritos=total_favoritos,
-    logros=len(logros_desbloqueados)
+    logros=len(logros_desbloqueados),
+    promedio=promedio_calificacion
 )
 
 mostrar_logros(logros_desbloqueados)
@@ -361,7 +370,7 @@ if pagina_actual == "✨ Mis KDramas Vistos":
 
     else:
         st.info("Aún no has marcado ningún KDrama como visto. ¡Explora el catálogo o usa el buscador!")
-        
+
 # PESTAÑA 4: FAVORITOS
 if pagina_actual == "⭐ Favoritos":
     st.subheader("⭐ Tus KDramas favoritos")

@@ -23,6 +23,14 @@ def mostrar_favorito(row, id_drama_favorito, limpiar_estado_favorito):
         recuerdo = html.escape(str(row["recuerdo"]).strip())
         recuerdo_html = f'<div class="favorite-memory">💜 {recuerdo}</div>'
 
+    calificacion_html = ""
+
+    if "calificacion" in row and pd.notna(row["calificacion"]):
+        calificacion = int(row["calificacion"])
+
+        if calificacion > 0:
+            calificacion_html = f'<div class="favorite-rating">⭐ {calificacion}/10</div>'
+
     tarjeta_html = (
         '<div class="favorite-card">'
         '<div class="favorite-poster-wrapper">'
@@ -30,6 +38,7 @@ def mostrar_favorito(row, id_drama_favorito, limpiar_estado_favorito):
         '</div>'
         '<div class="favorite-info">'
         f'<div class="favorite-title">⭐ {titulo_seguro}</div>'
+        f'{calificacion_html}'
         f'{recuerdo_html}'
         '</div>'
         '</div>'
@@ -47,6 +56,5 @@ def mostrar_favorito(row, id_drama_favorito, limpiar_estado_favorito):
         limpiar_estado_favorito(id_drama_favorito)
 
         st.session_state.mensaje_toast = f"Quitaste '{titulo}' de favoritos."
-
         st.session_state.pagina_pendiente = "⭐ Favoritos"
         st.rerun()
