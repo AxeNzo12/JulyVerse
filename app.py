@@ -125,6 +125,22 @@ def obtener_key_checkbox(prefijo_key, id_kdrama):
 
     return f"{prefijo_key}_{id_kdrama}_{version}"
 
+def limpiar_estado_favorito(id_kdrama):
+    id_kdrama = int(float(id_kdrama))
+
+    version_key = f"version_favorito_{id_kdrama}"
+
+    if version_key not in st.session_state:
+        st.session_state[version_key] = 0
+
+    st.session_state[version_key] += 1
+
+
+def obtener_key_favorito(id_kdrama):
+    id_kdrama = int(float(id_kdrama))
+    version = st.session_state.get(f"version_favorito_{id_kdrama}", 0)
+
+    return f"favorito_{id_kdrama}_{version}"
 
 df_vistos = cargar_vistos()
 lista_vistos_ids = df_vistos['id'].tolist() if not df_vistos.empty else []
@@ -155,7 +171,12 @@ mostrar_logros(logros_desbloqueados)
 
 
 # --- SISTEMA DE PESTAÑAS (TABS) ---
-tab_catalogo, tab_buscar, tab_lista = st.tabs(["📺 Catálogo", "🔍 Buscar Serie", "✨ Mis KDramas Vistos"])
+tab_catalogo, tab_buscar, tab_lista, tab_favoritos = st.tabs([
+    "📺 Catálogo",
+    "🔍 Buscar Serie",
+    "✨ Mis KDramas Vistos",
+    "⭐ Favoritos"
+])
 
 # PESTAÑA 1: CATÁLOGO POPULAR
 with tab_catalogo:
@@ -248,11 +269,13 @@ with tab_lista:
                 favorito_nuevo = st.checkbox(
                     "⭐ Favorito",
                     value=favorito_actual,
-                    key=f"favorito_{id_drama_lista}"
+                    key=obtener_key_favorito(id_drama_lista)
                 )
 
                 if favorito_nuevo != favorito_actual:
                     actualizar_favorito(id_drama_lista, favorito_nuevo)
+
+                    limpiar_estado_favorito(id_drama_lista)
 
                     if favorito_nuevo:
                         st.session_state.mensaje_toast = f"Agregaste '{row['titulo']}' a favoritos ⭐"
@@ -279,3 +302,45 @@ with tab_lista:
             st.divider() # Línea de separación
     else:
         st.info("Aún no has marcado ningún KDrama como visto. ¡Explora el catálogo o usa el buscador!")
+
+# PESTAÑA 4: FAVORITOS
+with tab_favoritos:
+    st.subheader("⭐ Tus KDramas favoritos")
+
+    df_favoritos = cargar_vistos()
+
+    if not df_favoritos.empty and "favorito" in df_favoritos.columns:
+        df_favoritos = df_favoritos[df_favoritos["favorito"] == True]
+
+    if not df_favoritos.empty:
+        for i, row in df_favoritos.iterrows():
+            id_drama_favorito = int(row["id"])
+
+            col_img, col_txt, col_btn = st.columns([1, 8, 2])
+
+            with col_img:
+                if pd.notna(row["poster"]) and row["poster"]:
+                    st.image(IMG_URL_SMALL + row["poster"], width=60)
+
+            with col_txt:
+                st.write("")
+                st.write(f"⭐ **{row['titulo']}**")
+
+                if "recuerdo" in row and pd.notna(row["recuerdo"]) and str(row["recuerdo"]).strip():
+                    st.caption(f"💜 {row['recuerdo']}")
+
+            with col_btn:
+                st.write("")
+
+                if st.button("Quitar favorito", key=f"quitar_fav_{id_drama_favorito}", use_container_width=True):
+                    actualizar_favorito(id_drama_favorito, False)
+
+                    limpiar_estado_favorito(id_drama_favorito)
+
+                    st.session_state.mensaje_toast = f"Quitaste '{row['titulo']}' de favoritos."
+                    st.rerun()
+
+            st.divider()
+
+    else:
+        st.info("Aún no has marcado ningún KDrama como favorito.")
