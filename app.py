@@ -302,7 +302,7 @@ if pagina_actual == "✨ Mis KDramas Vistos":
 
                         st.markdown(f"**💜 {titulo_top}**")
                         st.caption(f"⭐ {calificacion_top}/10")
-                        
+
         filtro_vistos = st.radio(
             "Filtrar KDramas",
             [
@@ -317,7 +317,27 @@ if pagina_actual == "✨ Mis KDramas Vistos":
             horizontal=True,
             key="filtro_vistos"
         )
+        col_buscar_vistos, col_orden_vistos = st.columns([2, 1])
 
+        with col_buscar_vistos:
+            busqueda_vistos = st.text_input(
+                "Buscar en tus KDramas vistos",
+                placeholder="Escribe el nombre de una serie...",
+                key="busqueda_vistos"
+            )
+
+        with col_orden_vistos:
+            orden_vistos = st.selectbox(
+                "Ordenar por",
+                [
+                    "Más recientes",
+                    "A-Z",
+                    "Z-A",
+                    "Mejor calificación",
+                    "Menor calificación"
+                ],
+                key="orden_vistos"
+            )
         df_filtrado = df_vistos_actualizado.copy()
 
         # Aseguramos columnas por si algún dato viejo no las tiene
@@ -363,6 +383,30 @@ if pagina_actual == "✨ Mis KDramas Vistos":
             df_filtrado = df_filtrado[
                 df_filtrado["calificacion"] >= 8
             ].sort_values("calificacion", ascending=False)
+        # --- BÚSQUEDA EN VISTOS ---
+        if busqueda_vistos.strip():
+            df_filtrado = df_filtrado[
+                df_filtrado["titulo"]
+                .fillna("")
+                .astype(str)
+                .str.contains(busqueda_vistos.strip(), case=False, na=False)
+            ]
+
+        # --- ORDENAMIENTO ---
+        if orden_vistos == "Más recientes":
+            df_filtrado = df_filtrado.iloc[::-1]
+
+        elif orden_vistos == "A-Z":
+            df_filtrado = df_filtrado.sort_values("titulo", ascending=True)
+
+        elif orden_vistos == "Z-A":
+            df_filtrado = df_filtrado.sort_values("titulo", ascending=False)
+
+        elif orden_vistos == "Mejor calificación":
+            df_filtrado = df_filtrado.sort_values("calificacion", ascending=False)
+
+        elif orden_vistos == "Menor calificación":
+            df_filtrado = df_filtrado.sort_values("calificacion", ascending=True)
 
         st.caption(f"Mostrando {len(df_filtrado)} de {len(df_vistos_actualizado)} KDramas")
 
