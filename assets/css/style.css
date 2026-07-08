@@ -236,3 +236,73 @@ div[data-testid="stCheckbox"]:active {
     font-weight: 700;
     margin-bottom: 6px;
 }
+
+/* ================================
+   CATÁLOGO JULYVERSE
+   ================================ */
+
+.catalog-card {
+    background: rgba(255, 255, 255, 0.50);
+    border: 1px solid rgba(255, 255, 255, 0.45);
+    border-radius: 24px;
+    padding: 14px;
+    margin-bottom: 12px;
+    min-height: 520px;
+    backdrop-filter: blur(14px);
+    box-shadow: 0 10px 26px rgba(124, 58, 237, 0.08);
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.catalog-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 16px 34px rgba(124, 58, 237, 0.18);
+}
+
+.catalog-poster-wrapper {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 14px;
+}
+
+.catalog-poster {
+    width: 100%;
+    max-width: 190px;
+    height: 285px;
+    object-fit: cover;
+    border-radius: 18px;
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.18);
+}
+
+.catalog-info {
+    text-align: center;
+}
+
+.catalog-title {
+    color: #4a044e;
+    font-size: 17px;
+    font-weight: 800;
+    line-height: 1.25;
+    min-height: 44px;
+    margin-bottom: 8px;
+}
+
+.catalog-meta {
+    color: #7c3aed;
+    font-size: 13px;
+    font-weight: 700;
+    margin-bottom: 10px;
+}
+
+.catalog-description {
+    color: #6b4e71;
+    font-size: 13px;
+    line-height: 1.35;
+    min-height: 72px;
+}
+
+.catalog-fallback {
+    margin-top: 10px;
+    color: #7c3aed;
+    font-size: 12px;
+    font-weight: 700;
+}
