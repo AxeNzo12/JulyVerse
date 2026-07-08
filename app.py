@@ -272,8 +272,37 @@ if pagina_actual == "✨ Mis KDramas Vistos":
     st.subheader("Tu historial de series terminadas")
 
     df_vistos_actualizado = cargar_vistos()
-
+    
     if not df_vistos_actualizado.empty:
+        # --- TOP DE JULY ---
+        df_top = df_vistos_actualizado.copy()
+
+        if "calificacion" not in df_top.columns:
+            df_top["calificacion"] = 0
+
+        df_top["calificacion"] = pd.to_numeric(
+            df_top["calificacion"],
+            errors="coerce"
+        ).fillna(0).astype(int)
+
+        df_top = df_top[df_top["calificacion"] > 0]
+        df_top = df_top.sort_values("calificacion", ascending=False).head(3)
+
+        if not df_top.empty:
+            with st.expander("👑 Top de July"):
+                cols_top = st.columns(3)
+
+                for indice, (_, drama_top) in enumerate(df_top.iterrows()):
+                    with cols_top[indice]:
+                        titulo_top = drama_top["titulo"]
+                        calificacion_top = int(drama_top["calificacion"])
+
+                        if pd.notna(drama_top["poster"]) and drama_top["poster"]:
+                            st.image(IMG_URL_SMALL + drama_top["poster"], width=120)
+
+                        st.markdown(f"**💜 {titulo_top}**")
+                        st.caption(f"⭐ {calificacion_top}/10")
+                        
         filtro_vistos = st.radio(
             "Filtrar KDramas",
             [
