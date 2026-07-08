@@ -6,6 +6,7 @@ from components.dashboard import mostrar_dashboard
 from components.welcome import mostrar_bienvenida
 from utils.special_dates import obtener_fecha_especial
 from components.drama_card import mostrar_tarjeta
+from components.watched_card import mostrar_kdrama_visto
 from components.memory_box import mostrar_caja_recuerdo
 from components.favorite_card import mostrar_favorito
 from utils.recuerdos import (
@@ -273,100 +274,85 @@ if pagina_actual == "✨ Mis KDramas Vistos":
     df_vistos_actualizado = cargar_vistos()
 
     if not df_vistos_actualizado.empty:
-        for i, row in df_vistos_actualizado.iterrows():
-            id_drama_lista = int(row["id"])
+        filtro_vistos = st.radio(
+            "Filtrar KDramas",
+            [
+                "Todos",
+                "⭐ Favoritos",
+                "📖 Con recuerdo",
+                "📝 Sin recuerdo",
+                "🌟 Calificados",
+                "❔ Sin calificar",
+                "🏆 Mejor calificados"
+            ],
+            horizontal=True,
+            key="filtro_vistos"
+        )
 
-            col_img, col_txt, col_check = st.columns([1, 8, 2])
+        df_filtrado = df_vistos_actualizado.copy()
 
-            with col_img:
-                if pd.notna(row["poster"]) and row["poster"]:
-                    st.image(IMG_URL_SMALL + row["poster"], width=60)
+        # Aseguramos columnas por si algún dato viejo no las tiene
+        if "favorito" not in df_filtrado.columns:
+            df_filtrado["favorito"] = False
 
-            with col_txt:
-                st.write("")
-                st.write(f"💜 **{row['titulo']}**")
+        if "recuerdo" not in df_filtrado.columns:
+            df_filtrado["recuerdo"] = ""
 
-                # --- FAVORITO ---
-                favorito_actual = False
+        if "calificacion" not in df_filtrado.columns:
+            df_filtrado["calificacion"] = 0
 
-                if "favorito" in row and pd.notna(row["favorito"]):
-                    favorito_actual = bool(row["favorito"])
+        df_filtrado["recuerdo"] = df_filtrado["recuerdo"].fillna("").astype(str)
+        df_filtrado["calificacion"] = pd.to_numeric(
+            df_filtrado["calificacion"],
+            errors="coerce"
+        ).fillna(0).astype(int)
 
-                favorito_nuevo = st.checkbox(
-                    "⭐ Favorito",
-                    value=favorito_actual,
-                    key=obtener_key_favorito(id_drama_lista)
+        if filtro_vistos == "⭐ Favoritos":
+            df_filtrado = df_filtrado[df_filtrado["favorito"] == True]
+
+        elif filtro_vistos == "📖 Con recuerdo":
+            df_filtrado = df_filtrado[
+                df_filtrado["recuerdo"].str.strip() != ""
+            ]
+
+        elif filtro_vistos == "📝 Sin recuerdo":
+            df_filtrado = df_filtrado[
+                df_filtrado["recuerdo"].str.strip() == ""
+            ]
+
+        elif filtro_vistos == "🌟 Calificados":
+            df_filtrado = df_filtrado[
+                df_filtrado["calificacion"] > 0
+            ].sort_values("calificacion", ascending=False)
+
+        elif filtro_vistos == "❔ Sin calificar":
+            df_filtrado = df_filtrado[
+                df_filtrado["calificacion"] == 0
+            ]
+
+        elif filtro_vistos == "🏆 Mejor calificados":
+            df_filtrado = df_filtrado[
+                df_filtrado["calificacion"] >= 8
+            ].sort_values("calificacion", ascending=False)
+
+        st.caption(f"Mostrando {len(df_filtrado)} de {len(df_vistos_actualizado)} KDramas")
+
+        if not df_filtrado.empty:
+            for i, row in df_filtrado.iterrows():
+                id_drama_lista = int(row["id"])
+
+                mostrar_kdrama_visto(
+                    row=row,
+                    id_drama_lista=id_drama_lista,
+                    obtener_key_favorito=obtener_key_favorito,
+                    limpiar_estado_favorito=limpiar_estado_favorito,
+                    limpiar_estado_drama=limpiar_estado_drama,
                 )
 
-                if favorito_nuevo != favorito_actual:
-                    actualizar_favorito(id_drama_lista, favorito_nuevo)
-
-                    limpiar_estado_favorito(id_drama_lista)
-
-                    if favorito_nuevo:
-                        st.session_state.mensaje_toast = f"Agregaste '{row['titulo']}' a favoritos ⭐"
-                    else:
-                        st.session_state.mensaje_toast = f"Quitaste '{row['titulo']}' de favoritos."
-
-                    st.session_state.pagina_pendiente = "✨ Mis KDramas Vistos"
-                    st.rerun()
-
-                # --- CALIFICACIÓN PERSONAL ---
-                calificacion_actual = 0
-
-                if "calificacion" in row and pd.notna(row["calificacion"]):
-                    calificacion_actual = int(row["calificacion"])
-
-                opciones_calificacion = ["Sin calificar"] + [str(i) for i in range(1, 11)]
-
-                indice_calificacion = 0
-
-                if calificacion_actual > 0:
-                    indice_calificacion = calificacion_actual
-
-                calificacion_seleccionada = st.selectbox(
-                    "⭐ Calificación",
-                    options=opciones_calificacion,
-                    index=indice_calificacion,
-                    key=f"calificacion_{id_drama_lista}"
-                )
-
-                nueva_calificacion = (
-                    0
-                    if calificacion_seleccionada == "Sin calificar"
-                    else int(calificacion_seleccionada)
-                )
-
-                if nueva_calificacion != calificacion_actual:
-                    actualizar_calificacion(id_drama_lista, nueva_calificacion)
-
-                    if nueva_calificacion > 0:
-                        st.session_state.mensaje_toast = f"Calificaste '{row['titulo']}' con {nueva_calificacion}/10 ⭐"
-                    else:
-                        st.session_state.mensaje_toast = f"Quitaste la calificación de '{row['titulo']}'."
-
-                    st.session_state.pagina_pendiente = "✨ Mis KDramas Vistos"
-                    st.rerun()
-
-                # --- RECUERDO ---
-                mostrar_caja_recuerdo(row, id_drama_lista)
-
-            with col_check:
                 st.write("")
 
-                if st.button("Quitar", key=f"btn_quitar_{id_drama_lista}", use_container_width=True):
-                    actualizar_visto(id_drama_lista, row["titulo"], row["poster"], False)
-
-                    limpiar_estado_drama(id_drama_lista)
-                    limpiar_estado_favorito(id_drama_lista)
-
-                    st.session_state.resultados_busqueda = []
-                    st.session_state.mensaje_toast = f"Quitaste '{row['titulo']}' de tu lista."
-
-                    st.session_state.pagina_pendiente = "✨ Mis KDramas Vistos"
-                    st.rerun()
-
-            st.divider()
+        else:
+            st.info("No hay KDramas que coincidan con este filtro.")
 
     else:
         st.info("Aún no has marcado ningún KDrama como visto. ¡Explora el catálogo o usa el buscador!")
