@@ -9,6 +9,8 @@ from utils.special_dates import obtener_fecha_especial
 from components.drama_card import mostrar_tarjeta
 from components.watched_card import mostrar_kdrama_visto
 from components.memory_box import mostrar_caja_recuerdo
+from components.stats_panel import mostrar_estadisticas
+from services.watchlist import cargar_por_ver, eliminar_por_ver
 from components.favorite_card import mostrar_favorito
 from utils.recuerdos import (
     imagen_a_base64,
@@ -212,6 +214,8 @@ def obtener_key_favorito(id_kdrama):
 
 df_vistos = cargar_vistos()
 lista_vistos_ids = df_vistos['id'].tolist() if not df_vistos.empty else []
+df_por_ver = cargar_por_ver()
+lista_por_ver_ids = df_por_ver["id"].tolist() if not df_por_ver.empty else []
 
 
 total_recuerdos = 0
@@ -251,7 +255,9 @@ OPCIONES_PAGINA = [
     "📺 Catálogo",
     "🔍 Buscar Serie",
     "✨ Mis KDramas Vistos",
-    "⭐ Favoritos"
+    "⭐ Favoritos",
+    "💫 Por Ver",
+    "📊 Estadísticas"
 ]
 
 if "pagina_actual" not in st.session_state:
@@ -292,7 +298,7 @@ if pagina_actual == "📺 Catálogo":
     columnas = st.columns(4) 
     for indice, drama in enumerate(kdramas):
         with columnas[indice % 4]:
-            mostrar_tarjeta(drama, "cat", lista_vistos_ids)
+            mostrar_tarjeta(drama, "cat", lista_vistos_ids, lista_por_ver_ids)
             
     st.divider()
     
@@ -328,7 +334,7 @@ if pagina_actual == "🔍 Buscar Serie":
         cols_busqueda = st.columns(4)
         for idx, res in enumerate(st.session_state.resultados_busqueda):
             with cols_busqueda[idx % 4]:
-                mostrar_tarjeta(res, "bus", lista_vistos_ids)
+                mostrar_tarjeta(res, "bus", lista_vistos_ids, lista_por_ver_ids)
     elif not st.session_state.resultados_busqueda and "busqueda" in locals() and busqueda:
         st.info("No se encontraron resultados.")
 
@@ -519,3 +525,64 @@ if pagina_actual == "⭐ Favoritos":
 
     else:
         st.info("Aún no has marcado ningún KDrama como favorito.")
+
+# PESTAÑA 5: POR VER
+if pagina_actual == "💫 Por Ver":
+    st.subheader("💫 KDramas por ver")
+
+    df_por_ver_actualizado = cargar_por_ver()
+
+    if not df_por_ver_actualizado.empty:
+        columnas_por_ver = st.columns(3)
+
+        for i, row in df_por_ver_actualizado.iterrows():
+            id_por_ver = int(row["id"])
+
+            with columnas_por_ver[i % 3]:
+                with st.container(border=True):
+                    if pd.notna(row["poster"]) and row["poster"]:
+                        st.image(IMG_URL + row["poster"], use_container_width=True)
+                    else:
+                        st.markdown("💜")
+
+                    st.markdown(f"### {row['titulo']}")
+
+                    if st.button(
+                        "Marcar como visto",
+                        key=f"por_ver_a_visto_{id_por_ver}",
+                        use_container_width=True
+                    ):
+                        actualizar_visto(
+                            id_por_ver,
+                            row["titulo"],
+                            row["poster"],
+                            True
+                        )
+
+                        eliminar_por_ver(id_por_ver)
+
+                        st.session_state.mensaje_toast = f"Moviste '{row['titulo']}' a vistos 💜"
+                        st.session_state.pagina_pendiente = "✨ Mis KDramas Vistos"
+                        st.rerun()
+
+                    if st.button(
+                        "Quitar",
+                        key=f"quitar_por_ver_page_{id_por_ver}",
+                        use_container_width=True
+                    ):
+                        eliminar_por_ver(id_por_ver)
+
+                        st.session_state.mensaje_toast = f"Quitaste '{row['titulo']}' de Por Ver."
+                        st.session_state.pagina_pendiente = "💫 Por Ver"
+                        st.rerun()
+
+    else:
+        st.info("Aún no tienes KDramas guardados para ver después.")
+        
+# PESTAÑA 6: ESTADÍSTICAS
+if pagina_actual == "📊 Estadísticas":
+    st.subheader("📊 Estadísticas de JulyVerse")
+
+    df_estadisticas = cargar_vistos()
+
+    mostrar_estadisticas(df_estadisticas)

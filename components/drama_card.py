@@ -4,6 +4,7 @@ import streamlit as st
 
 from services.tmdb import IMG_URL
 from services.storage import actualizar_visto
+from services.watchlist import agregar_por_ver, eliminar_por_ver
 from utils.recuerdos import imagen_a_base64, obtener_recuerdo_por_indice
 
 
@@ -31,7 +32,10 @@ def obtener_imagen_fallback(id_kdrama):
     return imagen_a_base64(ruta_recuerdo)
 
 
-def mostrar_tarjeta(drama, prefijo_key, lista_vistos_ids):
+def mostrar_tarjeta(drama, prefijo_key, lista_vistos_ids, lista_por_ver_ids=None):
+    if lista_por_ver_ids is None:
+        lista_por_ver_ids = []
+
     id_kdrama = int(drama.get("id", 0))
     titulo = drama.get("name", "Sin título")
     poster = drama.get("poster_path", "")
@@ -43,6 +47,7 @@ def mostrar_tarjeta(drama, prefijo_key, lista_vistos_ids):
     descripcion_segura = html.escape(descripcion)
 
     visto_actual = id_kdrama in lista_vistos_ids
+    en_por_ver = id_kdrama in lista_por_ver_ids
 
     if poster:
         imagen_html = f'<img src="{IMG_URL + poster}" class="catalog-poster">'
@@ -93,8 +98,32 @@ def mostrar_tarjeta(drama, prefijo_key, lista_vistos_ids):
         )
 
         if visto_nuevo:
+            eliminar_por_ver(id_kdrama)
             st.session_state.mensaje_toast = f"Agregaste '{titulo}' a tus KDramas vistos 💜"
+            st.session_state.pagina_pendiente = "✨ Mis KDramas Vistos"
         else:
             st.session_state.mensaje_toast = f"Quitaste '{titulo}' de tus KDramas vistos."
 
         st.rerun()
+
+    if not visto_actual:
+        if en_por_ver:
+            if st.button(
+                "Quitar de Por Ver",
+                key=f"quitar_por_ver_{prefijo_key}_{id_kdrama}",
+                use_container_width=True
+            ):
+                eliminar_por_ver(id_kdrama)
+
+                st.session_state.mensaje_toast = f"Quitaste '{titulo}' de Por Ver."
+                st.rerun()
+        else:
+            if st.button(
+                "💫 Quiero verla",
+                key=f"agregar_por_ver_{prefijo_key}_{id_kdrama}",
+                use_container_width=True
+            ):
+                agregar_por_ver(id_kdrama, titulo, poster)
+
+                st.session_state.mensaje_toast = f"Agregaste '{titulo}' a Por Ver 💫"
+                st.rerun()
