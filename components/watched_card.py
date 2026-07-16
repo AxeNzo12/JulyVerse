@@ -97,7 +97,7 @@ def mostrar_kdrama_visto(
         with col_btn:
             st.write("")
 
-            if st.button("Quitar", key=f"btn_quitar_{id_drama_lista}", use_container_width=True):
+            if st.button("Quitar", key=f"btn_quitar_{id_drama_lista}", width="stretch"):
                 actualizar_visto(id_drama_lista, row["titulo"], row["poster"], False)
 
                 limpiar_estado_drama(id_drama_lista)

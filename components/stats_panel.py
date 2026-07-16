@@ -124,7 +124,7 @@ def mostrar_estadisticas(df_vistos):
             }
         )
 
-        st.dataframe(tabla_top, hide_index=True, use_container_width=True)
+        st.dataframe(tabla_top, hide_index=True, width="stretch")
 
     else:
         st.info("Todavía no hay KDramas calificados. Cuando califiques alguno, aquí aparecerán las estadísticas.")

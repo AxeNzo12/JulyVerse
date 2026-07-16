@@ -49,7 +49,7 @@ def mostrar_favorito(row, id_drama_favorito, limpiar_estado_favorito):
     if st.button(
         "Quitar favorito",
         key=f"quitar_fav_{id_drama_favorito}",
-        use_container_width=True
+        width="stretch"
     ):
         actualizar_favorito(id_drama_favorito, False)
 

@@ -306,3 +306,66 @@ div[data-testid="stCheckbox"]:active {
     font-size: 12px;
     font-weight: 700;
 }
+
+/* ================================
+   WATCHLIST / POR VER JULYVERSE
+   ================================ */
+
+.watchlist-card {
+    background: rgba(255, 255, 255, 0.50);
+    border: 1px solid rgba(255, 255, 255, 0.45);
+    border-radius: 24px;
+    padding: 16px;
+    margin-bottom: 12px;
+    min-height: 390px;
+    backdrop-filter: blur(14px);
+    box-shadow: 0 10px 26px rgba(124, 58, 237, 0.08);
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.watchlist-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 16px 34px rgba(124, 58, 237, 0.18);
+}
+
+.watchlist-poster-wrapper {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 14px;
+}
+
+.watchlist-poster {
+    width: 100%;
+    max-width: 190px;
+    height: 255px;
+    object-fit: cover;
+    border-radius: 18px;
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.18);
+}
+
+.watchlist-placeholder {
+    width: 190px;
+    height: 285px;
+    border-radius: 18px;
+    background: rgba(216, 180, 254, 0.45);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 48px;
+}
+
+.watchlist-title {
+    color: #4a044e;
+    font-size: 18px;
+    font-weight: 800;
+    text-align: center;
+    line-height: 1.25;
+    margin-bottom: 8px;
+}
+
+.watchlist-caption {
+    color: #7c3aed;
+    font-size: 13px;
+    font-weight: 700;
+    text-align: center;
+}

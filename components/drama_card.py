@@ -111,7 +111,7 @@ def mostrar_tarjeta(drama, prefijo_key, lista_vistos_ids, lista_por_ver_ids=None
             if st.button(
                 "Quitar de Por Ver",
                 key=f"quitar_por_ver_{prefijo_key}_{id_kdrama}",
-                use_container_width=True
+                width="stretch"
             ):
                 eliminar_por_ver(id_kdrama)
 
@@ -121,7 +121,7 @@ def mostrar_tarjeta(drama, prefijo_key, lista_vistos_ids, lista_por_ver_ids=None
             if st.button(
                 "💫 Quiero verla",
                 key=f"agregar_por_ver_{prefijo_key}_{id_kdrama}",
-                use_container_width=True
+                width="stretch"
             ):
                 agregar_por_ver(id_kdrama, titulo, poster)
 

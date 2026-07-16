@@ -11,6 +11,7 @@ from components.watched_card import mostrar_kdrama_visto
 from components.memory_box import mostrar_caja_recuerdo
 from components.stats_panel import mostrar_estadisticas
 from services.watchlist import cargar_por_ver, eliminar_por_ver
+from components.watchlist_card import mostrar_por_ver_card
 from components.favorite_card import mostrar_favorito
 from utils.recuerdos import (
     imagen_a_base64,
@@ -76,7 +77,7 @@ with st.sidebar:
                 data=archivo,
                 file_name="respaldo_julyverse.csv",
                 mime="text/csv",
-                use_container_width=True
+                width="stretch"
             )
         ruta_por_ver = Path("por_ver.csv")
 
@@ -87,7 +88,7 @@ with st.sidebar:
                 data=archivo_por_ver,
                 file_name="respaldo_por_ver_julyverse.csv",
                 mime="text/csv",
-                use_container_width=True
+                width="stretch"
             )
     else:
         st.caption("Aún no hay datos para respaldar.")
@@ -112,7 +113,7 @@ with st.sidebar:
 
                 st.warning("Restaurar este respaldo reemplazará los datos actuales.")
 
-                if st.button("Restaurar respaldo", use_container_width=True):
+                if st.button("Restaurar respaldo", width="stretch"):
                     if "poster" not in df_importado.columns:
                         df_importado["poster"] = ""
 
@@ -138,7 +139,57 @@ with st.sidebar:
         except Exception as error:
             st.error("No pude leer el respaldo. Revisa que sea un archivo CSV válido.")
             st.caption(f"Detalle técnico: {error}")
+        st.markdown("### 📤 Restaurar Por Ver")
 
+    archivo_por_ver_respaldo = st.file_uploader(
+        "Sube tu respaldo de Por Ver",
+        type=["csv"],
+        key="archivo_respaldo_por_ver_julyverse"
+    )
+
+    if archivo_por_ver_respaldo is not None:
+        try:
+            df_por_ver_importado = pd.read_csv(archivo_por_ver_respaldo)
+
+            columnas_obligatorias_por_ver = {"id", "titulo"}
+
+            if not columnas_obligatorias_por_ver.issubset(df_por_ver_importado.columns):
+                st.error("Este archivo no parece ser un respaldo válido de Por Ver.")
+            else:
+                st.caption(f"Se encontraron {len(df_por_ver_importado)} KDramas por ver.")
+
+                st.warning("Restaurar este respaldo reemplazará tu lista actual de Por Ver.")
+
+                if st.button("Restaurar Por Ver", width="stretch"):
+                    if "poster" not in df_por_ver_importado.columns:
+                        df_por_ver_importado["poster"] = ""
+
+                    df_por_ver_importado = df_por_ver_importado[
+                        ["id", "titulo", "poster"]
+                    ]
+
+                    df_por_ver_importado["id"] = pd.to_numeric(
+                        df_por_ver_importado["id"],
+                        errors="coerce"
+                    )
+
+                    df_por_ver_importado = df_por_ver_importado.dropna(subset=["id"])
+                    df_por_ver_importado["id"] = df_por_ver_importado["id"].astype(int)
+
+                    df_por_ver_importado = df_por_ver_importado.drop_duplicates(
+                        subset=["id"],
+                        keep="first"
+                    )
+
+                    df_por_ver_importado.to_csv("por_ver.csv", index=False)
+
+                    st.session_state.mensaje_toast = "Lista Por Ver restaurada correctamente 💫"
+                    st.session_state.pagina_pendiente = "💫 Por Ver"
+                    st.rerun()
+
+        except Exception as error:
+            st.error("No pude leer el respaldo de Por Ver. Revisa que sea un archivo CSV válido.")
+            st.caption(f"Detalle técnico: {error}")
 if "bienvenida_actual" not in st.session_state:
     st.session_state.bienvenida_actual = obtener_bienvenida()
 
@@ -318,7 +369,7 @@ if pagina_actual == "📺 Catálogo":
     # Botón mágico para cargar 20 más
     col_espacio1, col_boton, col_espacio2 = st.columns([1, 1, 1])
     with col_boton:
-        if st.button("➕ Cargar más KDramas", use_container_width=True):
+        if st.button("➕ Cargar más KDramas", width="stretch"):
             st.session_state.pagina_catalogo += 1
             st.rerun()
 # PESTAÑA 2: BUSCADOR
@@ -333,7 +384,7 @@ if pagina_actual == "🔍 Buscar Serie":
             busqueda = st.text_input("Escribe el nombre de la serie:", label_visibility="collapsed")
         with col_btn:
             # Al estar dentro del form, el botón se activa automáticamente con Enter
-            submit_button = st.form_submit_button(label="🔍 Buscar", use_container_width=True)
+            submit_button = st.form_submit_button(label="🔍 Buscar", width="stretch")
             
         if submit_button:
             if busqueda:
@@ -546,48 +597,58 @@ if pagina_actual == "💫 Por Ver":
     df_por_ver_actualizado = cargar_por_ver()
 
     if not df_por_ver_actualizado.empty:
-        columnas_por_ver = st.columns(3)
+        col_buscar_por_ver, col_orden_por_ver = st.columns([2, 1])
 
-        for i, row in df_por_ver_actualizado.iterrows():
-            id_por_ver = int(row["id"])
+        with col_buscar_por_ver:
+            busqueda_por_ver = st.text_input(
+                "Buscar en Por Ver",
+                placeholder="Escribe el nombre de una serie...",
+                key="busqueda_por_ver"
+            )
 
-            with columnas_por_ver[i % 3]:
-                with st.container(border=True):
-                    if pd.notna(row["poster"]) and row["poster"]:
-                        st.image(IMG_URL + row["poster"], use_container_width=True)
-                    else:
-                        st.markdown("💜")
+        with col_orden_por_ver:
+            orden_por_ver = st.selectbox(
+                "Ordenar Por Ver",
+                [
+                    "Más recientes",
+                    "A-Z",
+                    "Z-A"
+                ],
+                key="orden_por_ver"
+            )
 
-                    st.markdown(f"### {row['titulo']}")
+        df_por_ver_filtrado = df_por_ver_actualizado.copy()
 
-                    if st.button(
-                        "Marcar como visto",
-                        key=f"por_ver_a_visto_{id_por_ver}",
-                        use_container_width=True
-                    ):
-                        actualizar_visto(
-                            id_por_ver,
-                            row["titulo"],
-                            row["poster"],
-                            True
-                        )
+        if busqueda_por_ver.strip():
+            df_por_ver_filtrado = df_por_ver_filtrado[
+                df_por_ver_filtrado["titulo"]
+                .fillna("")
+                .astype(str)
+                .str.contains(busqueda_por_ver.strip(), case=False, na=False)
+            ]
 
-                        eliminar_por_ver(id_por_ver)
+        if orden_por_ver == "Más recientes":
+            df_por_ver_filtrado = df_por_ver_filtrado.iloc[::-1]
 
-                        st.session_state.mensaje_toast = f"Moviste '{row['titulo']}' a vistos 💜"
-                        st.session_state.pagina_pendiente = "✨ Mis KDramas Vistos"
-                        st.rerun()
+        elif orden_por_ver == "A-Z":
+            df_por_ver_filtrado = df_por_ver_filtrado.sort_values("titulo", ascending=True)
 
-                    if st.button(
-                        "Quitar",
-                        key=f"quitar_por_ver_page_{id_por_ver}",
-                        use_container_width=True
-                    ):
-                        eliminar_por_ver(id_por_ver)
+        elif orden_por_ver == "Z-A":
+            df_por_ver_filtrado = df_por_ver_filtrado.sort_values("titulo", ascending=False)
+        df_por_ver_filtrado = df_por_ver_filtrado.reset_index(drop=True)
+        st.caption(
+            f"Mostrando {len(df_por_ver_filtrado)} de {len(df_por_ver_actualizado)} KDramas por ver"
+        )
 
-                        st.session_state.mensaje_toast = f"Quitaste '{row['titulo']}' de Por Ver."
-                        st.session_state.pagina_pendiente = "💫 Por Ver"
-                        st.rerun()
+        if not df_por_ver_filtrado.empty:
+            columnas_por_ver = st.columns(3)
+            for i, row in df_por_ver_filtrado.iterrows():
+                id_por_ver = int(row["id"])
+
+                with columnas_por_ver[i % 3]:
+                    mostrar_por_ver_card(row, id_por_ver)
+        else:
+            st.info("No hay KDramas que coincidan con tu búsqueda.")
 
     else:
         st.info("Aún no tienes KDramas guardados para ver después.")
