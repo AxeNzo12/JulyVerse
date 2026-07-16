@@ -1,5 +1,6 @@
 import streamlit as st
 import pandas as pd
+from pathlib import Path
 from utils.paths import IMAGES, CSS
 from utils.messages import obtener_bienvenida
 from components.dashboard import mostrar_dashboard
@@ -60,6 +61,23 @@ with st.sidebar:
         st.image(IMAGES / "ui" / "tata.png")
     except:
         st.info("💡 Guarda una foto como 'taehyung.jpg' en tu carpeta para que aparezca aquí.")
+    st.divider()
+
+    st.subheader("💾 Respaldo")
+
+    ruta_csv = Path("mis_kdramas.csv")
+
+    if ruta_csv.exists():
+        with open(ruta_csv, "rb") as archivo:
+            st.download_button(
+                label="Descargar respaldo",
+                data=archivo,
+                file_name="respaldo_julyverse.csv",
+                mime="text/csv",
+                use_container_width=True
+            )
+    else:
+        st.caption("Aún no hay datos para respaldar.")
 
 if "bienvenida_actual" not in st.session_state:
     st.session_state.bienvenida_actual = obtener_bienvenida()
