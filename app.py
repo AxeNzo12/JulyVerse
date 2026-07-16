@@ -78,6 +78,53 @@ with st.sidebar:
             )
     else:
         st.caption("Aún no hay datos para respaldar.")
+        st.markdown("### 📤 Restaurar respaldo")
+
+    archivo_respaldo = st.file_uploader(
+        "Sube tu respaldo CSV",
+        type=["csv"],
+        key="archivo_respaldo_julyverse"
+    )
+
+    if archivo_respaldo is not None:
+        try:
+            df_importado = pd.read_csv(archivo_respaldo)
+
+            columnas_obligatorias = {"id", "titulo"}
+
+            if not columnas_obligatorias.issubset(df_importado.columns):
+                st.error("Este archivo no parece ser un respaldo válido de JulyVerse.")
+            else:
+                st.caption(f"Se encontraron {len(df_importado)} KDramas en el respaldo.")
+
+                st.warning("Restaurar este respaldo reemplazará los datos actuales.")
+
+                if st.button("Restaurar respaldo", use_container_width=True):
+                    if "poster" not in df_importado.columns:
+                        df_importado["poster"] = ""
+
+                    if "recuerdo" not in df_importado.columns:
+                        df_importado["recuerdo"] = ""
+
+                    if "favorito" not in df_importado.columns:
+                        df_importado["favorito"] = False
+
+                    if "calificacion" not in df_importado.columns:
+                        df_importado["calificacion"] = 0
+
+                    df_importado = df_importado[
+                        ["id", "titulo", "poster", "recuerdo", "favorito", "calificacion"]
+                    ]
+
+                    df_importado.to_csv("mis_kdramas.csv", index=False)
+
+                    st.session_state.mensaje_toast = "Respaldo restaurado correctamente 💜"
+                    st.session_state.pagina_pendiente = "✨ Mis KDramas Vistos"
+                    st.rerun()
+
+        except Exception as error:
+            st.error("No pude leer el respaldo. Revisa que sea un archivo CSV válido.")
+            st.caption(f"Detalle técnico: {error}")
 
 if "bienvenida_actual" not in st.session_state:
     st.session_state.bienvenida_actual = obtener_bienvenida()
