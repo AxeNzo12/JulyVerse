@@ -78,6 +78,17 @@ with st.sidebar:
                 mime="text/csv",
                 use_container_width=True
             )
+        ruta_por_ver = Path("por_ver.csv")
+
+    if ruta_por_ver.exists():
+        with open(ruta_por_ver, "rb") as archivo_por_ver:
+            st.download_button(
+                label="Descargar Por Ver",
+                data=archivo_por_ver,
+                file_name="respaldo_por_ver_julyverse.csv",
+                mime="text/csv",
+                use_container_width=True
+            )
     else:
         st.caption("Aún no hay datos para respaldar.")
         st.markdown("### 📤 Restaurar respaldo")
@@ -216,6 +227,7 @@ df_vistos = cargar_vistos()
 lista_vistos_ids = df_vistos['id'].tolist() if not df_vistos.empty else []
 df_por_ver = cargar_por_ver()
 lista_por_ver_ids = df_por_ver["id"].tolist() if not df_por_ver.empty else []
+total_por_ver = len(lista_por_ver_ids)
 
 
 total_recuerdos = 0
@@ -245,7 +257,8 @@ mostrar_dashboard(
     recuerdos=total_recuerdos,
     favoritos=total_favoritos,
     logros=len(logros_desbloqueados),
-    promedio=promedio_calificacion
+    promedio=promedio_calificacion,
+    por_ver=total_por_ver
 )
 
 mostrar_logros(logros_desbloqueados)
@@ -578,7 +591,7 @@ if pagina_actual == "💫 Por Ver":
 
     else:
         st.info("Aún no tienes KDramas guardados para ver después.")
-        
+
 # PESTAÑA 6: ESTADÍSTICAS
 if pagina_actual == "📊 Estadísticas":
     st.subheader("📊 Estadísticas de JulyVerse")
