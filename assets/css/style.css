@@ -225,6 +225,16 @@ div[role="radiogroup"] label:hover {
     transform: translateY(-2px);
 }
 
+div[role="radiogroup"] label:has(input:checked) {
+    background: linear-gradient(135deg, #7c3aed, #a855f7);
+    border-color: rgba(124, 58, 237, 0.65);
+    box-shadow: 0 6px 14px rgba(124, 58, 237, 0.18);
+}
+
+div[role="radiogroup"] label:has(input:checked) p {
+    color: white !important;
+}
+
 /* Botones */
 .stButton > button {
     border-radius: 999px !important;
