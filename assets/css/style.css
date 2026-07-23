@@ -104,9 +104,57 @@ div[data-testid="stMetric"]:hover{
 
 html, body, [data-testid="stAppViewContainer"] {
     background:
-        radial-gradient(circle at top left, rgba(192, 132, 252, 0.35), transparent 35%),
-        radial-gradient(circle at top right, rgba(124, 58, 237, 0.20), transparent 30%),
-        linear-gradient(135deg, #f4e8ff 0%, #ead7ff 45%, #dcc8ff 100%) !important;
+        radial-gradient(circle at 12% 18%, rgba(79, 70, 229, 0.34), transparent 34%),
+        radial-gradient(circle at 86% 16%, rgba(236, 72, 153, 0.24), transparent 30%),
+        radial-gradient(circle at 72% 82%, rgba(30, 64, 175, 0.24), transparent 38%),
+        radial-gradient(circle at 38% 58%, rgba(255, 255, 255, 0.38), transparent 28%),
+        linear-gradient(145deg, #eadfff 0%, #cbbaf6 36%, #b5b9ed 68%, #9f98d2 100%) !important;
+}
+
+/* Fondo de estrellas visible y ligero */
+[data-testid="stAppViewContainer"] {
+    position: relative;
+    isolation: isolate;
+}
+
+[data-testid="stAppViewContainer"]::before {
+    content: "";
+    position: fixed;
+    inset: -250px;
+    z-index: 0;
+    pointer-events: none;
+    opacity: 0.80;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='210' viewBox='0 0 240 210'%3E%3Cpolygon fill='%23ffffff' fill-opacity='.96' points='24,4%2027,15%2038,18%2027,21%2024,32%2021,21%2010,18%2021,15'/%3E%3Cpolygon fill='%23e0e7ff' fill-opacity='.94' points='172,26%20175,39%20188,42%20175,45%20172,58%20169,45%20156,42%20169,39'/%3E%3Cpolygon fill='%23ffffff' fill-opacity='.88' points='92,76%2094,85%20103,88%2094,91%2092,100%2090,91%2081,88%2090,85'/%3E%3Cpolygon fill='%23fbcfe8' fill-opacity='.92' points='216,104%20219,115%20230,118%20219,121%20216,132%20213,121%20202,118%20213,115'/%3E%3Cpolygon fill='%23ffffff' fill-opacity='.95' points='50,140%2053,147%2061,148%2055,153%2057,161%2050,157%2043,161%2045,153%2039,148%2047,147'/%3E%3Cpolygon fill='%23e0e7ff' fill-opacity='.92' points='142,164%20145,176%20157,179%20145,182%20142,194%20139,182%20127,179%20139,176'/%3E%3Cpolygon fill='%234c1d95' fill-opacity='.48' points='224,184%20226,191%20233,193%20226,195%20224,202%20222,195%20215,193%20222,191'/%3E%3C/svg%3E");
+    background-size: 240px 210px;
+    animation: julyverse-stars-travel 42s linear infinite;
+}
+
+[data-testid="stMain"] {
+    position: relative;
+    z-index: 1;
+}
+
+/* La barra superior continúa el fondo espacial */
+[data-testid="stHeader"],
+[data-testid="stToolbar"] {
+    background: transparent !important;
+    backdrop-filter: none !important;
+    box-shadow: none !important;
+}
+
+@keyframes julyverse-stars-travel {
+    from {
+        transform: translate3d(0, 0, 0);
+    }
+    to {
+        transform: translate3d(240px, -210px, 0);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    [data-testid="stAppViewContainer"]::before {
+        animation: none;
+    }
 }
 
 /* Contenedor principal */
@@ -205,6 +253,12 @@ div[data-testid="stMetric"]:hover {
     box-shadow: 0 14px 34px rgba(124, 58, 237, 0.18);
 }
 
+/* La gráfica de estadísticas se integra con el fondo de JulyVerse */
+[data-testid="stVegaLiteChart"],
+[data-testid="stVegaLiteChart"] > div {
+    background: transparent !important;
+}
+
 /* Navegación con radio: estilo pestañas */
 div[role="radiogroup"] {
     display: flex;
@@ -275,6 +329,64 @@ div[role="radiogroup"] label:has(input:checked) p {
 }
 
 [data-testid="stDownloadButton"] > button:hover p {
+    color: white !important;
+}
+
+/* Cargadores de respaldo */
+[data-testid="stSidebar"] [data-testid="stFileUploader"] {
+    margin-bottom: 1rem;
+}
+
+[data-testid="stSidebar"] [data-testid="stFileUploaderDropzone"] {
+    min-height: 76px;
+    padding: 12px;
+    border: 1px dashed rgba(124, 58, 237, 0.42);
+    border-radius: 18px;
+    background: linear-gradient(
+        135deg,
+        rgba(255, 255, 255, 0.72),
+        rgba(233, 213, 255, 0.62)
+    );
+    transition: border-color 0.2s ease, background 0.2s ease;
+}
+
+[data-testid="stSidebar"] [data-testid="stFileUploaderDropzone"]:hover {
+    border-color: #7c3aed;
+    background: rgba(255, 255, 255, 0.88);
+}
+
+[data-testid="stSidebar"] [data-testid="stFileUploaderDropzone"] button {
+    border-radius: 999px !important;
+    border: 1px solid rgba(124, 58, 237, 0.28) !important;
+    background: #7c3aed !important;
+    color: white !important;
+}
+
+[data-testid="stSidebar"] [data-testid="stFileUploaderDropzone"] button p,
+[data-testid="stSidebar"] [data-testid="stFileUploaderDropzone"] button span {
+    color: white !important;
+}
+
+[data-testid="stSidebar"] [data-testid="stFileUploaderDropzoneInstructions"] span {
+    color: #6b4e71 !important;
+    font-size: 12px;
+}
+
+/* Controles nativos para ocultar y volver a mostrar la barra lateral */
+[data-testid="stSidebarCollapseButton"] button,
+button[data-testid="stExpandSidebarButton"] {
+    width: 36px;
+    height: 36px;
+    border: 1px solid rgba(124, 58, 237, 0.26) !important;
+    border-radius: 50% !important;
+    background: rgba(255, 255, 255, 0.88) !important;
+    color: #7c3aed !important;
+    box-shadow: 0 4px 12px rgba(124, 58, 237, 0.12);
+}
+
+[data-testid="stSidebarCollapseButton"] button:hover,
+button[data-testid="stExpandSidebarButton"]:hover {
+    background: #7c3aed !important;
     color: white !important;
 }
 

@@ -38,7 +38,8 @@ from components.achievements import (
 st.set_page_config(
     page_title="JulyVerse",
     page_icon="💜",
-    layout="wide"
+    layout="wide",
+    initial_sidebar_state="expanded"
 )
 
 # Muestra la notificación animada si hay un mensaje pendiente
@@ -91,12 +92,15 @@ with st.sidebar:
             )
     else:
         st.caption("Aún no hay datos para respaldar.")
-        st.markdown("### 📤 Restaurar respaldo")
+
+    st.markdown("#### 📤 Restaurar vistos")
+    st.caption("Selecciona un respaldo de tus KDramas vistos.")
 
     archivo_respaldo = st.file_uploader(
-        "Sube tu respaldo CSV",
+        "Respaldo de KDramas vistos",
         type=["csv"],
-        key="archivo_respaldo_julyverse"
+        key="archivo_respaldo_julyverse",
+        label_visibility="collapsed"
     )
 
     if archivo_respaldo is not None:
@@ -138,12 +142,15 @@ with st.sidebar:
         except Exception as error:
             st.error("No pude leer el respaldo. Revisa que sea un archivo CSV válido.")
             st.caption(f"Detalle técnico: {error}")
-        st.markdown("### 📤 Restaurar Por Ver")
+
+    st.markdown("#### 💫 Restaurar Por Ver")
+    st.caption("Selecciona un respaldo de tu lista Por Ver.")
 
     archivo_por_ver_respaldo = st.file_uploader(
-        "Sube tu respaldo de Por Ver",
+        "Respaldo de la lista Por Ver",
         type=["csv"],
-        key="archivo_respaldo_por_ver_julyverse"
+        key="archivo_respaldo_por_ver_julyverse",
+        label_visibility="collapsed"
     )
 
     if archivo_por_ver_respaldo is not None:

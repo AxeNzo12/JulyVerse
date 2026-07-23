@@ -1,3 +1,4 @@
+import altair as alt
 import pandas as pd
 import streamlit as st
 
@@ -105,9 +106,54 @@ def mostrar_estadisticas(df_vistos):
             .sort_index()
         )
 
-        st.bar_chart(distribucion)
+        datos_grafica = (
+            distribucion
+            .rename_axis("calificacion")
+            .reset_index(name="cantidad")
+        )
 
-        st.divider()
+        grafica = (
+            alt.Chart(datos_grafica)
+            .mark_bar(
+                color="#7C3AED",
+                cornerRadiusTopLeft=7,
+                cornerRadiusTopRight=7
+            )
+            .encode(
+                x=alt.X(
+                    "calificacion:O",
+                    title="Calificación",
+                    sort=list(range(1, 11)),
+                    axis=alt.Axis(labelAngle=0)
+                ),
+                y=alt.Y(
+                    "cantidad:Q",
+                    title="Cantidad de KDramas",
+                    axis=alt.Axis(tickMinStep=1)
+                ),
+                tooltip=[
+                    alt.Tooltip("calificacion:O", title="Calificación"),
+                    alt.Tooltip("cantidad:Q", title="KDramas")
+                ]
+            )
+            .properties(
+                height=300,
+                background="transparent"
+            )
+            .configure_view(strokeOpacity=0)
+            .configure_axis(
+                labelColor="#32113D",
+                labelFontSize=13,
+                labelFontWeight=600,
+                titleColor="#32113D",
+                titleFontSize=14,
+                titleFontWeight=700,
+                gridColor="#D8B4FE",
+                gridOpacity=0.35
+            )
+        )
+
+        st.altair_chart(grafica, width="stretch")
 
         st.subheader("🏆 Top 5 de July")
 
