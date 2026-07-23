@@ -428,12 +428,11 @@ if pagina_actual == "🔍 Buscar Serie":
     
     # Creamos un formulario que agrupa la caja de texto y el botón
     with st.form(key='formulario_busqueda', clear_on_submit=False):
-        col_input, col_btn = st.columns([4, 1])
-        with col_input:
-            busqueda = st.text_input("Escribe el nombre de la serie:", label_visibility="collapsed")
-        with col_btn:
-            # Al estar dentro del form, el botón se activa automáticamente con Enter
-            submit_button = st.form_submit_button(label="🔍 Buscar", width="stretch")
+        busqueda = st.text_input("Escribe el nombre de la serie:", label_visibility="collapsed")
+
+        # Al estar dentro del form, el botón se activa automáticamente con Enter.
+        # Mantenerlo como hijo directo evita un aviso fugaz de Streamlit.
+        submit_button = st.form_submit_button(label="🔍 Buscar", width="stretch")
             
         if submit_button:
             if busqueda:
