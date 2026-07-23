@@ -133,6 +133,62 @@ p, label, span {
     color: #3f3147;
 }
 
+/* Tarjetas del dashboard */
+.metric-card {
+    background: rgba(255, 255, 255, 0.58);
+    border: 1px solid rgba(255, 255, 255, 0.55);
+    border-radius: 20px;
+    padding: 16px;
+    min-height: 145px;
+}
+
+.metric-icon {
+    font-size: 24px;
+    line-height: 1;
+    margin-bottom: 10px;
+}
+
+.metric-title {
+    color: #5b2167;
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.metric-value {
+    color: #3f0b49;
+    font-size: 24px;
+    font-weight: 800;
+    line-height: 1.2;
+    margin: 4px 0 6px;
+}
+
+.metric-description {
+    color: #6b4e71;
+    font-size: 13px;
+    line-height: 1.35;
+}
+
+@media (max-width: 768px) {
+    .metric-card {
+        min-height: 110px;
+        padding: 12px 14px;
+    }
+
+    .metric-icon {
+        font-size: 20px;
+        margin-bottom: 6px;
+    }
+
+    .metric-value {
+        font-size: 20px;
+        margin: 2px 0 4px;
+    }
+
+    .metric-description {
+        font-size: 12px;
+    }
+}
+
 /* Métricas */
 div[data-testid="stMetric"] {
     background: rgba(255, 255, 255, 0.50) !important;
