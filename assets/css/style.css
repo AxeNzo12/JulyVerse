@@ -243,6 +243,31 @@ div[role="radiogroup"] label:hover {
     box-shadow: 0 10px 22px rgba(124, 58, 237, 0.22);
 }
 
+/* Botones de descarga del respaldo */
+[data-testid="stDownloadButton"] > button {
+    width: 100%;
+    border-radius: 999px !important;
+    border: 1px solid rgba(124, 58, 237, 0.25) !important;
+    background: rgba(255, 255, 255, 0.78) !important;
+    color: #4a044e !important;
+    font-weight: 600;
+    transition: all 0.2s ease;
+}
+
+[data-testid="stDownloadButton"] > button p {
+    color: #4a044e !important;
+}
+
+[data-testid="stDownloadButton"] > button:hover {
+    background: #7c3aed !important;
+    color: white !important;
+    border-color: #7c3aed !important;
+}
+
+[data-testid="stDownloadButton"] > button:hover p {
+    color: white !important;
+}
+
 /* Inputs, selectbox, text area */
 textarea, input, div[data-baseweb="select"] {
     border-radius: 16px !important;
