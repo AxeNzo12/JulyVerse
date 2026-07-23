@@ -40,9 +40,8 @@ def obtener_kdramas_populares(pagina, id_genero):
         datos = respuesta.json()
         return datos.get("results", [])
 
-    except requests.exceptions.RequestException as error:
+    except requests.exceptions.RequestException:
         st.error("No pude conectar con TMDB. Revisa tu internet o intenta de nuevo en unos minutos.")
-        st.caption(f"Detalle técnico: {error}")
         return []
 
 def buscar_kdrama(query):
@@ -60,7 +59,6 @@ def buscar_kdrama(query):
 
         return respuesta.json().get("results", [])
 
-    except requests.exceptions.RequestException as error:
+    except requests.exceptions.RequestException:
         st.error("No pude realizar la búsqueda en TMDB. Intenta de nuevo en unos minutos.")
-        st.caption(f"Detalle técnico: {error}")
         return []

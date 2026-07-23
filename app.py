@@ -52,7 +52,6 @@ def cargar_css():
 
 cargar_css()
 
-
 # --- MENÚ LATERAL ---
 with st.sidebar:
     st.title("🐻 Tata")
@@ -241,6 +240,41 @@ def reset_pagina():
     st.session_state.pagina_catalogo = 1
 
 
+def mostrar_paginacion_catalogo(posicion):
+    col_anterior, col_pagina, col_siguiente = st.columns([1, 1, 1])
+
+    with col_anterior:
+        if st.button(
+            "⬅️ Anterior",
+            key=f"catalogo_anterior_{posicion}",
+            width="stretch",
+            disabled=st.session_state.pagina_catalogo <= 1
+        ):
+            st.session_state.pagina_catalogo -= 1
+            st.session_state.subir_catalogo = True
+            st.rerun()
+
+    with col_pagina:
+        st.markdown(
+            f"""
+            <div style="text-align:center; font-weight:700; color:#4a044e; padding-top:8px;">
+                Página {st.session_state.pagina_catalogo}
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
+
+    with col_siguiente:
+        if st.button(
+            "Siguiente ➡️",
+            key=f"catalogo_siguiente_{posicion}",
+            width="stretch"
+        ):
+            st.session_state.pagina_catalogo += 1
+            st.session_state.subir_catalogo = True
+            st.rerun()
+
+
 def limpiar_estado_drama(id_kdrama):
     id_kdrama = int(float(id_kdrama))
 
@@ -342,6 +376,24 @@ pagina_actual = st.radio(
 
 # PESTAÑA 1: CATÁLOGO POPULAR
 if pagina_actual == "📺 Catálogo":
+    if st.session_state.pop("subir_catalogo", False):
+        id_inicio_catalogo = f"catalogo-inicio-{st.session_state.pagina_catalogo}"
+
+        st.html(
+            f"""
+            <div id="{id_inicio_catalogo}"></div>
+            <script>
+                setTimeout(function() {{
+                    document.getElementById("{id_inicio_catalogo}")?.scrollIntoView({{
+                        behavior: "smooth",
+                        block: "start"
+                    }});
+                }}, 150);
+            </script>
+            """,
+            unsafe_allow_javascript=True
+        )
+
     col_titulo, col_filtro = st.columns([2, 1])
     with col_titulo:
         st.subheader("Lo más popular del momento")
@@ -355,7 +407,9 @@ if pagina_actual == "📺 Catálogo":
     
     # Traducimos el texto seleccionado a su ID numérico
     id_genero_filtro = GENEROS_TMDB[genero_seleccionado]
-    
+
+    mostrar_paginacion_catalogo("superior")
+
     # Llamamos a la API con la página actual y el género
     kdramas = obtener_kdramas_populares(st.session_state.pagina_catalogo, id_genero_filtro)
     
@@ -366,31 +420,7 @@ if pagina_actual == "📺 Catálogo":
             
     st.divider()
 
-col_anterior, col_pagina, col_siguiente = st.columns([1, 1, 1])
-
-with col_anterior:
-    if st.button(
-        "⬅️ Anterior",
-        width="stretch",
-        disabled=st.session_state.pagina_catalogo <= 1
-    ):
-        st.session_state.pagina_catalogo -= 1
-        st.rerun()
-
-with col_pagina:
-    st.markdown(
-        f"""
-        <div style="text-align:center; font-weight:700; color:#4a044e; padding-top:8px;">
-            Página {st.session_state.pagina_catalogo}
-        </div>
-        """,
-        unsafe_allow_html=True
-    )
-
-with col_siguiente:
-    if st.button("Siguiente ➡️", width="stretch"):
-        st.session_state.pagina_catalogo += 1
-        st.rerun()
+    mostrar_paginacion_catalogo("inferior")
     
 # PESTAÑA 2: BUSCADOR MEJORADO (CON FORMULARIO)
 if pagina_actual == "🔍 Buscar Serie":
