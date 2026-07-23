@@ -2,7 +2,7 @@ import html
 
 import streamlit as st
 
-from services.tmdb import IMG_URL
+from services.tmdb import IMG_URL_SMALL
 from services.storage import actualizar_visto
 from services.watchlist import agregar_por_ver, eliminar_por_ver
 from utils.recuerdos import imagen_a_base64, obtener_recuerdo_por_indice
@@ -50,7 +50,7 @@ def mostrar_tarjeta(drama, prefijo_key, lista_vistos_ids, lista_por_ver_ids=None
     en_por_ver = id_kdrama in lista_por_ver_ids
 
     if poster:
-        imagen_html = f'<img src="{IMG_URL + poster}" class="catalog-poster">'
+        imagen_html = f'<img loading="lazy" src="{IMG_URL_SMALL + poster}" class="catalog-poster">'
         fallback_texto = ""
     else:
         imagen_base64 = obtener_imagen_fallback(id_kdrama)

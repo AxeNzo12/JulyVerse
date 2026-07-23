@@ -365,14 +365,33 @@ if pagina_actual == "📺 Catálogo":
             mostrar_tarjeta(drama, "cat", lista_vistos_ids, lista_por_ver_ids)
             
     st.divider()
+
+col_anterior, col_pagina, col_siguiente = st.columns([1, 1, 1])
+
+with col_anterior:
+    if st.button(
+        "⬅️ Anterior",
+        width="stretch",
+        disabled=st.session_state.pagina_catalogo <= 1
+    ):
+        st.session_state.pagina_catalogo -= 1
+        st.rerun()
+
+with col_pagina:
+    st.markdown(
+        f"""
+        <div style="text-align:center; font-weight:700; color:#4a044e; padding-top:8px;">
+            Página {st.session_state.pagina_catalogo}
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
+
+with col_siguiente:
+    if st.button("Siguiente ➡️", width="stretch"):
+        st.session_state.pagina_catalogo += 1
+        st.rerun()
     
-    # Botón mágico para cargar 20 más
-    col_espacio1, col_boton, col_espacio2 = st.columns([1, 1, 1])
-    with col_boton:
-        if st.button("➕ Cargar más KDramas", width="stretch"):
-            st.session_state.pagina_catalogo += 1
-            st.rerun()
-# PESTAÑA 2: BUSCADOR
 # PESTAÑA 2: BUSCADOR MEJORADO (CON FORMULARIO)
 if pagina_actual == "🔍 Buscar Serie":
     st.subheader("Encuentra una serie específica")

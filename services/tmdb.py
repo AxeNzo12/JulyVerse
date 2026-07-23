@@ -19,36 +19,31 @@ def obtener_api_key():
     return st.secrets["TMDB_API_KEY"]
 
 @st.cache_data(show_spinner=False, ttl=3600)
-def obtener_kdramas_populares(limite_paginas, id_genero):
-    resultados_totales = []
+def obtener_kdramas_populares(pagina, id_genero):
+    url = f"{BASE_URL}/discover/tv"
 
-    for p in range(1, limite_paginas + 1):
-        url = f"{BASE_URL}/discover/tv"
+    parametros = {
+        "api_key": obtener_api_key(),
+        "with_origin_country": "KR",
+        "sort_by": "popularity.desc",
+        "language": "es-MX",
+        "page": pagina
+    }
 
-        parametros = {
-            "api_key": obtener_api_key(),
-            "with_origin_country": "KR",
-            "sort_by": "popularity.desc",
-            "language": "es-MX",
-            "page": p
-        }
+    if id_genero:
+        parametros["with_genres"] = id_genero
 
-        if id_genero:
-            parametros["with_genres"] = id_genero
+    try:
+        respuesta = requests.get(url, params=parametros, timeout=10)
+        respuesta.raise_for_status()
 
-        try:
-            respuesta = requests.get(url, params=parametros, timeout=10)
-            respuesta.raise_for_status()
+        datos = respuesta.json()
+        return datos.get("results", [])
 
-            datos = respuesta.json()
-            resultados_totales.extend(datos.get("results", []))
-
-        except requests.exceptions.RequestException as error:
-            st.error("No pude conectar con TMDB. Revisa tu internet o intenta de nuevo en unos minutos.")
-            st.caption(f"Detalle técnico: {error}")
-            return []
-
-    return resultados_totales
+    except requests.exceptions.RequestException as error:
+        st.error("No pude conectar con TMDB. Revisa tu internet o intenta de nuevo en unos minutos.")
+        st.caption(f"Detalle técnico: {error}")
+        return []
 
 def buscar_kdrama(query):
     url = f"{BASE_URL}/search/tv"

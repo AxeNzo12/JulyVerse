@@ -369,3 +369,68 @@ div[data-testid="stCheckbox"]:active {
     font-weight: 700;
     text-align: center;
 }
+
+/* ================================
+   PERFORMANCE PATCH JULYVERSE
+   ================================ */
+
+/* Menos trabajo para el navegador */
+[data-testid="stSidebar"],
+.metric-card,
+.catalog-card,
+.favorite-card,
+.watchlist-card,
+details {
+    backdrop-filter: none !important;
+}
+
+/* Evita que todas las imágenes tengan animación global */
+img:hover {
+    transform: none !important;
+}
+
+/* Sombras más ligeras */
+.metric-card,
+.catalog-card,
+.favorite-card,
+.watchlist-card {
+    box-shadow: 0 6px 16px rgba(124, 58, 237, 0.08) !important;
+    transition: transform 0.12s ease, box-shadow 0.12s ease !important;
+}
+
+.metric-card:hover,
+.catalog-card:hover,
+.favorite-card:hover,
+.watchlist-card:hover {
+    transform: translateY(-2px) !important;
+    box-shadow: 0 8px 20px rgba(124, 58, 237, 0.12) !important;
+}
+
+/* Catálogo más compacto */
+.catalog-card {
+    min-height: 455px !important;
+}
+
+.catalog-poster {
+    max-width: 160px !important;
+    height: 240px !important;
+}
+
+.catalog-description {
+    min-height: 58px !important;
+}
+
+/* Por Ver más compacto */
+.watchlist-card {
+    min-height: 350px !important;
+}
+
+.watchlist-poster {
+    max-width: 160px !important;
+    height: 240px !important;
+}
+
+.watchlist-placeholder {
+    width: 160px !important;
+    height: 240px !important;
+}
