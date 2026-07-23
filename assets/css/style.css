@@ -124,7 +124,7 @@ html, body, [data-testid="stAppViewContainer"] {
     z-index: 0;
     pointer-events: none;
     opacity: 0.80;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='210' viewBox='0 0 240 210'%3E%3Cpolygon fill='%23ffffff' fill-opacity='.96' points='24,4%2027,15%2038,18%2027,21%2024,32%2021,21%2010,18%2021,15'/%3E%3Cpolygon fill='%23e0e7ff' fill-opacity='.94' points='172,26%20175,39%20188,42%20175,45%20172,58%20169,45%20156,42%20169,39'/%3E%3Cpolygon fill='%23ffffff' fill-opacity='.88' points='92,76%2094,85%20103,88%2094,91%2092,100%2090,91%2081,88%2090,85'/%3E%3Cpolygon fill='%23fbcfe8' fill-opacity='.92' points='216,104%20219,115%20230,118%20219,121%20216,132%20213,121%20202,118%20213,115'/%3E%3Cpolygon fill='%23ffffff' fill-opacity='.95' points='50,140%2053,147%2061,148%2055,153%2057,161%2050,157%2043,161%2045,153%2039,148%2047,147'/%3E%3Cpolygon fill='%23e0e7ff' fill-opacity='.92' points='142,164%20145,176%20157,179%20145,182%20142,194%20139,182%20127,179%20139,176'/%3E%3Cpolygon fill='%234c1d95' fill-opacity='.48' points='224,184%20226,191%20233,193%20226,195%20224,202%20222,195%20215,193%20222,191'/%3E%3C/svg%3E");
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='210' viewBox='0 0 240 210'%3E%3Cpolygon fill='%23ffffff' fill-opacity='.96' points='24,4%2027,15%2038,18%2027,21%2024,32%2021,21%2010,18%2021,15'/%3E%3Cpolygon fill='%23e0e7ff' fill-opacity='.94' points='172,26%20175,39%20188,42%20175,45%20172,58%20169,45%20156,42%20169,39'/%3E%3Cpolygon fill='%23ffffff' fill-opacity='.88' points='92,76%2094,85%20103,88%2094,91%2092,100%2090,91%2081,88%2090,85'/%3E%3Cpolygon fill='%23fbcfe8' fill-opacity='.92' points='216,104%20219,115%20230,118%20219,121%20216,132%20213,121%20202,118%20213,115'/%3E%3Cpolygon fill='%23ffffff' fill-opacity='.95' points='50,140%2053,147%2061,148%2055,153%2057,161%2050,157%2043,161%2045,153%2039,148%2047,147'/%3E%3C/svg%3E");
     background-size: 240px 210px;
     animation: julyverse-stars-travel 42s linear infinite;
 }
@@ -154,6 +154,14 @@ html, body, [data-testid="stAppViewContainer"] {
 @media (prefers-reduced-motion: reduce) {
     [data-testid="stAppViewContainer"]::before {
         animation: none;
+    }
+}
+
+/* En celular usamos menos estrellas para mantener el fondo limpio */
+@media (max-width: 768px) {
+    [data-testid="stAppViewContainer"]::before {
+        opacity: 0.64;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='210' viewBox='0 0 240 210'%3E%3Cpolygon fill='%23ffffff' fill-opacity='.94' points='28,8%2031,19%2042,22%2031,25%2028,36%2025,25%2014,22%2025,19'/%3E%3Cpolygon fill='%23e0e7ff' fill-opacity='.90' points='178,36%20181,47%20192,50%20181,53%20178,64%20175,53%20164,50%20175,47'/%3E%3Cpolygon fill='%23fbcfe8' fill-opacity='.88' points='64,132%2067,141%2076,144%2067,147%2064,156%2061,147%2052,144%2061,141'/%3E%3Cpolygon fill='%23ffffff' fill-opacity='.92' points='194,170%20197,181%20208,184%20197,187%20194,198%20191,187%20180,184%20191,181'/%3E%3C/svg%3E");
     }
 }
 
@@ -261,17 +269,37 @@ div[data-testid="stMetric"]:hover {
 
 /* Navegación con radio: estilo pestañas */
 div[role="radiogroup"] {
-    display: flex;
+    display: grid !important;
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    align-items: stretch;
     gap: 10px;
     padding: 8px 0 12px 0;
 }
 
 div[role="radiogroup"] label {
+    width: 100%;
+    min-width: 0;
+    min-height: 52px;
+    height: 100%;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     background: rgba(255, 255, 255, 0.42);
     border: 1px solid rgba(255, 255, 255, 0.45);
     border-radius: 999px;
-    padding: 8px 14px;
+    padding: 8px 10px;
     transition: all 0.25s ease;
+}
+
+div[role="radiogroup"] label > div:first-child {
+    display: none;
+}
+
+div[role="radiogroup"] label p {
+    line-height: 1.2;
+    text-align: center;
+    white-space: normal;
 }
 
 div[role="radiogroup"] label:hover {
@@ -287,6 +315,18 @@ div[role="radiogroup"] label:has(input:checked) {
 
 div[role="radiogroup"] label:has(input:checked) p {
     color: white !important;
+}
+
+@media (max-width: 1100px) {
+    div[role="radiogroup"] {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 650px) {
+    div[role="radiogroup"] {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
 }
 
 /* Botones */
@@ -433,6 +473,10 @@ div[data-testid="stCheckbox"]:active {
     transform: scale(0.95);
 }  
 
+.achievements-spacer {
+    height: 18px;
+}
+
 .favorite-rating {
     color: #7C3AED;
     font-size: 15px;
@@ -443,6 +487,44 @@ div[data-testid="stCheckbox"]:active {
 /* ================================
    CATÁLOGO JULYVERSE
    ================================ */
+
+div[class*="st-key-catalogo_visto_"] button {
+    border-color: rgba(124, 58, 237, 0.34) !important;
+    background: rgba(255, 255, 255, 0.72) !important;
+}
+
+div[class*="st-key-catalogo_visto_"] button p {
+    color: #5b2167 !important;
+}
+
+div[class*="st-key-catalogo_visto_"] button[data-testid="stBaseButton-primary"] {
+    background: linear-gradient(135deg, #7c3aed, #a855f7) !important;
+    color: white !important;
+}
+
+div[class*="st-key-catalogo_visto_"] button[data-testid="stBaseButton-primary"] p {
+    color: white !important;
+}
+
+div[class*="st-key-catalogo_visto_"] button:hover {
+    background: #6d28d9 !important;
+    color: white !important;
+}
+
+div[class*="st-key-catalogo_visto_"] button:hover p {
+    color: white !important;
+}
+
+div[class*="st-key-catalogo_estado_visto_"] button:disabled {
+    opacity: 1;
+    border-color: rgba(124, 58, 237, 0.16) !important;
+    background: rgba(233, 213, 255, 0.48) !important;
+    color: #6b4e71 !important;
+}
+
+div[class*="st-key-catalogo_estado_visto_"] button:disabled p {
+    color: #6b4e71 !important;
+}
 
 .catalog-card {
     background: rgba(255, 255, 255, 0.50);

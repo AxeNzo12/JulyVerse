@@ -8,13 +8,6 @@ from services.watchlist import agregar_por_ver, eliminar_por_ver
 from utils.recuerdos import imagen_a_base64, obtener_recuerdo_por_indice
 
 
-def obtener_key_checkbox(prefijo_key, id_kdrama):
-    id_kdrama = int(float(id_kdrama))
-    version = st.session_state.get(f"version_drama_{id_kdrama}", 0)
-
-    return f"{prefijo_key}_visto_{id_kdrama}_{version}"
-
-
 def obtener_imagen_fallback(id_kdrama):
     if "imagenes_asignadas" not in st.session_state:
         st.session_state.imagenes_asignadas = {}
@@ -83,13 +76,22 @@ def mostrar_tarjeta(drama, prefijo_key, lista_vistos_ids, lista_por_ver_ids=None
 
     st.markdown(tarjeta_html, unsafe_allow_html=True)
 
-    visto_nuevo = st.checkbox(
-        "Ya lo vi",
-        value=visto_actual,
-        key=obtener_key_checkbox(prefijo_key, id_kdrama)
+    texto_boton_visto = "✅ Ya la viste" if visto_actual else "✓ Marcar como vista"
+    ayuda_boton_visto = (
+        "Haz clic para quitarla de tus KDramas vistos."
+        if visto_actual
+        else "Haz clic para agregarla a tus KDramas vistos."
     )
 
-    if visto_nuevo != visto_actual:
+    if st.button(
+        texto_boton_visto,
+        key=f"catalogo_visto_{prefijo_key}_{id_kdrama}",
+        type="primary" if visto_actual else "secondary",
+        help=ayuda_boton_visto,
+        width="stretch"
+    ):
+        visto_nuevo = not visto_actual
+
         actualizar_visto(
             id_kdrama=id_kdrama,
             titulo=titulo,
@@ -106,7 +108,14 @@ def mostrar_tarjeta(drama, prefijo_key, lista_vistos_ids, lista_por_ver_ids=None
 
         st.rerun()
 
-    if not visto_actual:
+    if visto_actual:
+        st.button(
+            "💜 En tus vistos",
+            key=f"catalogo_estado_visto_{prefijo_key}_{id_kdrama}",
+            width="stretch",
+            disabled=True
+        )
+    else:
         if en_por_ver:
             if st.button(
                 "Quitar de Por Ver",

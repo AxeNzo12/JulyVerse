@@ -69,6 +69,11 @@ def calcular_logros(total_vistos, total_recuerdos):
 
 
 def mostrar_logros(logros):
+    st.markdown(
+        '<div class="achievements-spacer" aria-hidden="true"></div>',
+        unsafe_allow_html=True
+    )
+
     with st.expander("🏆 Logros desbloqueados"):
         if not logros:
             st.info("Aún no hay logros desbloqueados. El primero llegará cuando termines tu primer KDrama.")
