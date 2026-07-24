@@ -3,6 +3,7 @@ import streamlit as st
 import pandas as pd
 from pathlib import Path
 from utils.paths import IMAGES, CSS
+from utils.auth import cerrar_sesion, mostrar_acceso
 from utils.messages import obtener_bienvenida
 from components.dashboard import mostrar_dashboard
 from components.welcome import mostrar_bienvenida
@@ -49,21 +50,26 @@ st.set_page_config(
     initial_sidebar_state="auto"
 )
 
-# Muestra la notificación animada si hay un mensaje pendiente
-if 'mensaje_toast' in st.session_state:
-    st.toast(st.session_state.mensaje_toast, icon="✨")
-    del st.session_state.mensaje_toast
-
 def cargar_css():
     with open(CSS / "style.css", encoding="utf-8") as f:
         st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
 
 cargar_css()
 
+if not mostrar_acceso():
+    st.stop()
+
+# Muestra la notificación animada si hay un mensaje pendiente
+if 'mensaje_toast' in st.session_state:
+    st.toast(st.session_state.mensaje_toast, icon="✨")
+    del st.session_state.mensaje_toast
+
 # --- MENÚ LATERAL ---
 with st.sidebar:
     st.title("🐻 Tata")
     st.caption("Compañero oficial de JulyVerse 💜")
+    if st.button("Cerrar sesión", icon=":material/logout:", width="stretch"):
+        cerrar_sesion()
     st.write(
     "Estoy aquí para acompañarte mientras descubres nuevas historias."
     )

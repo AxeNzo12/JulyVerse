@@ -42,6 +42,74 @@ hr{
     border-radius:14px;
 }
 
+/* Acceso privado de JulyVerse */
+div[class*="st-key-login_julyverse"] {
+    margin-top: clamp(3rem, 12vh, 7rem);
+    padding: 30px 28px 26px;
+    border: 1px solid rgba(255, 255, 255, 0.72);
+    border-radius: 28px;
+    background: rgba(255, 255, 255, 0.50);
+    box-shadow: 0 20px 48px rgba(76, 29, 149, 0.18);
+    backdrop-filter: blur(12px);
+}
+
+.login-julyverse-header {
+    margin-bottom: 22px;
+    text-align: center;
+}
+
+.login-julyverse-star {
+    display: inline-grid;
+    width: 48px;
+    height: 48px;
+    margin-bottom: 8px;
+    place-items: center;
+    border-radius: 50%;
+    background: linear-gradient(145deg, #7c3aed, #a855f7);
+    box-shadow: 0 8px 20px rgba(109, 40, 217, 0.26);
+    color: #ffffff;
+    font-size: 24px;
+}
+
+.login-julyverse-header h1 {
+    margin: 2px 0 5px;
+    font-size: clamp(30px, 5vw, 42px);
+}
+
+.login-julyverse-header p {
+    margin: 0;
+    color: #5b2167;
+    line-height: 1.45;
+}
+
+div[class*="st-key-login_julyverse"] [data-testid="stForm"] {
+    padding: 0;
+    border: 0;
+    background: transparent;
+}
+
+div[class*="st-key-login_julyverse"] [data-testid="stFormSubmitButton"] button {
+    min-height: 44px;
+    border: 0;
+    background: linear-gradient(135deg, #7c3aed, #9333ea);
+    color: #ffffff;
+    font-weight: 700;
+    box-shadow: 0 7px 16px rgba(109, 40, 217, 0.20);
+}
+
+div[class*="st-key-login_julyverse"] [data-testid="stFormSubmitButton"] button:hover {
+    background: linear-gradient(135deg, #6d28d9, #7e22ce);
+    color: #ffffff;
+}
+
+@media (max-width: 768px) {
+    div[class*="st-key-login_julyverse"] {
+        margin-top: 2.5rem;
+        padding: 24px 18px 20px;
+        border-radius: 24px;
+    }
+}
+
 div[data-testid="stMetric"]{
     transition:.25s;
 }
