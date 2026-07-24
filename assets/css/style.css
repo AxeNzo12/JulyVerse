@@ -1577,6 +1577,35 @@ div[class*="st-key-recommendation_item_"] {
     font-weight: 800;
 }
 
+.recommendation-affinity {
+    display: inline-flex;
+    align-items: center;
+    align-self: center;
+    gap: 5px;
+    padding: 6px 11px;
+    border-radius: 999px;
+    font-size: 13px;
+    font-weight: 800;
+}
+
+.recommendation-affinity-high {
+    border: 1px solid rgba(124, 58, 237, 0.24);
+    background: rgba(124, 58, 237, 0.14);
+    color: #5b21b6;
+}
+
+.recommendation-affinity-medium {
+    border: 1px solid rgba(168, 85, 247, 0.20);
+    background: rgba(216, 180, 254, 0.24);
+    color: #6b21a8;
+}
+
+.recommendation-affinity-soft {
+    border: 1px solid rgba(91, 33, 182, 0.14);
+    background: rgba(255, 255, 255, 0.58);
+    color: #6b4e71;
+}
+
 .recommendation-reasons {
     display: flex;
     flex-wrap: wrap;
@@ -1632,6 +1661,222 @@ div[class*="st-key-recommendation_item_"] {
     color: #6b4e71;
     font-size: 14px;
     line-height: 1.5;
+}
+
+div[class*="st-key-ver_detalles_recomendacion_"] button {
+    border-color: rgba(124, 58, 237, 0.20) !important;
+    background: rgba(255, 255, 255, 0.64) !important;
+}
+
+div[class*="st-key-ver_detalles_recomendacion_"] button p {
+    color: #5b21b6 !important;
+    font-size: 13px;
+    font-weight: 750;
+}
+
+div[class*="st-key-ocultar_recomendacion_"] button {
+    border-color: rgba(107, 78, 113, 0.14) !important;
+    background: rgba(255, 255, 255, 0.42) !important;
+}
+
+div[class*="st-key-ocultar_recomendacion_"] button p {
+    color: #765b7c !important;
+    font-size: 13px;
+    font-weight: 650;
+}
+
+div[class*="st-key-ocultar_recomendacion_"] button:hover {
+    border-color: rgba(190, 24, 93, 0.20) !important;
+    background: rgba(255, 241, 246, 0.78) !important;
+}
+
+div[class*="st-key-ocultar_recomendacion_"] button:hover p {
+    color: #9d174d !important;
+}
+
+/* Ventana integrada de detalles */
+[data-testid="stDialog"] [role="dialog"] {
+    max-height: calc(100vh - 48px) !important;
+    overflow-y: auto;
+    border: 1px solid rgba(255, 255, 255, 0.64);
+    border-radius: 26px;
+    background: linear-gradient(
+        145deg,
+        rgba(245, 237, 255, 0.98),
+        rgba(224, 207, 252, 0.98)
+    );
+    box-shadow: 0 24px 60px rgba(76, 29, 149, 0.24);
+}
+
+[data-testid="stDialog"] img {
+    border-radius: 18px;
+    box-shadow: 0 10px 22px rgba(76, 29, 149, 0.18);
+}
+
+[data-testid="stDialog"] [data-testid="stImage"] {
+    display: flex;
+    justify-content: center;
+}
+
+[data-testid="stDialog"] h4 {
+    color: #4a044e !important;
+}
+
+.details-heading strong {
+    display: block;
+    color: #4a044e;
+    font-size: 24px;
+    font-weight: 850;
+    line-height: 1.2;
+}
+
+.details-heading span {
+    display: block;
+    margin-top: 4px;
+    color: #806187;
+    font-size: 13px;
+}
+
+.details-genres {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 12px;
+}
+
+.details-genre {
+    padding: 5px 9px;
+    border: 1px solid rgba(124, 58, 237, 0.16);
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.56);
+    color: #65328a;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.details-data-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 7px;
+    margin-top: 16px;
+}
+
+.details-data-item {
+    padding: 9px 6px;
+    border: 1px solid rgba(255, 255, 255, 0.58);
+    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.40);
+    text-align: center;
+}
+
+.details-data-item strong,
+.details-data-item span {
+    display: block;
+}
+
+.details-data-item strong {
+    color: #5b21b6;
+    font-size: 14px;
+}
+
+.details-data-item span {
+    margin-top: 2px;
+    color: #806187;
+    font-size: 10px;
+}
+
+.details-poster-placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 240px;
+    border: 1px solid rgba(255, 255, 255, 0.58);
+    border-radius: 18px;
+    background: rgba(255, 255, 255, 0.40);
+    font-size: 46px;
+}
+
+.details-cast-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 8px;
+}
+
+.details-cast-item {
+    padding: 10px 11px;
+    border: 1px solid rgba(255, 255, 255, 0.58);
+    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.40);
+}
+
+.details-cast-item strong,
+.details-cast-item span {
+    display: block;
+}
+
+.details-cast-item strong {
+    color: #4a044e;
+    font-size: 13px;
+}
+
+.details-cast-item span {
+    margin-top: 2px;
+    color: #806187;
+    font-size: 11px;
+}
+
+/* Vista previa del futuro proyecto de anime */
+.animeverse-preview {
+    max-width: 980px;
+    margin: 28px auto 8px;
+    padding: 22px;
+    border: 1px solid rgba(255, 255, 255, 0.60);
+    border-radius: 25px;
+    background: linear-gradient(
+        135deg,
+        rgba(255, 247, 252, 0.58),
+        rgba(237, 233, 254, 0.46)
+    );
+    box-shadow: 0 8px 20px rgba(76, 29, 149, 0.08);
+    text-align: center;
+}
+
+.animeverse-eyebrow {
+    color: #9333ea;
+    font-size: 10px;
+    font-weight: 850;
+    letter-spacing: 1.5px;
+}
+
+.animeverse-title {
+    margin-top: 5px;
+    color: #4a044e;
+    font-size: 22px;
+    font-weight: 850;
+}
+
+.animeverse-preview p {
+    max-width: 560px;
+    margin: 7px auto 15px;
+    color: #6b4e71;
+    font-size: 14px;
+}
+
+.animeverse-features {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 7px;
+}
+
+.animeverse-features span {
+    padding: 6px 10px;
+    border: 1px solid rgba(124, 58, 237, 0.14);
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.58);
+    color: #65328a;
+    font-size: 12px;
+    font-weight: 700;
 }
 
 /* ================================
@@ -1973,6 +2218,34 @@ img:hover {
     .recommendation-empty-state {
         margin-top: 16px;
         padding: 24px 18px;
+    }
+
+    [data-testid="stDialog"] [role="dialog"] {
+        width: calc(100vw - 18px) !important;
+        max-width: calc(100vw - 18px) !important;
+        max-height: calc(100vh - 18px) !important;
+        border-radius: 22px;
+    }
+
+    .details-heading strong {
+        font-size: 21px;
+    }
+
+    .details-data-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .details-cast-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .animeverse-preview {
+        padding: 20px 16px;
+    }
+
+    .animeverse-features {
+        align-items: center;
+        flex-direction: column;
     }
 
     div[data-testid="stForm"]:has(

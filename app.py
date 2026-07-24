@@ -16,6 +16,10 @@ from components.watchlist_card import mostrar_por_ver_card
 from components.favorite_card import mostrar_favorito
 from components.recommendation_card import mostrar_recomendacion
 from services.recommendations import generar_recomendaciones
+from services.recommendation_preferences import (
+    cargar_no_interesan,
+    restaurar_recomendacion,
+)
 from utils.recuerdos import (
     imagen_a_base64,
     obtener_recuerdo_por_indice,
@@ -95,6 +99,18 @@ with st.sidebar:
             )
     else:
         st.caption("Aún no hay datos para respaldar.")
+
+    ruta_preferencias = Path("no_me_interesan.csv")
+
+    if ruta_preferencias.exists():
+        with open(ruta_preferencias, "rb") as archivo_preferencias:
+            st.download_button(
+                label="Descargar preferencias",
+                data=archivo_preferencias,
+                file_name="preferencias_julyverse.csv",
+                mime="text/csv",
+                width="stretch"
+            )
 
     st.markdown("#### 📤 Restaurar vistos")
     st.caption("Selecciona un respaldo de tus KDramas vistos.")
@@ -442,6 +458,8 @@ if pagina_actual == "💜 Para July":
         "Historias elegidas según sus calificaciones, favoritos, géneros "
         "y actores que ya ha visto."
     )
+    df_no_interesan = cargar_no_interesan()
+    ids_no_interesan = set(df_no_interesan["id"].tolist())
 
     if df_vistos.empty:
         st.markdown(
@@ -462,7 +480,8 @@ if pagina_actual == "💜 Para July":
         with st.spinner("Conectando historias que podrían gustarle a July..."):
             resultado_recomendaciones = generar_recomendaciones(
                 df_vistos,
-                limite=6
+                limite=6,
+                ids_ocultos=ids_no_interesan
             )
 
         recomendaciones = resultado_recomendaciones["recomendaciones"]
@@ -531,15 +550,60 @@ if pagina_actual == "💜 Para July":
                 """
                 <div class="recommendation-empty-state">
                     <div class="recommendation-empty-icon">✨</div>
-                    <strong>No pude preparar recomendaciones ahora</strong>
+                    <strong>No encontré nuevas recomendaciones ahora</strong>
                     <span>
-                        Revisa la conexión con TMDB e inténtalo nuevamente
-                        en unos minutos.
+                        Puedes restaurar alguna historia oculta o intentarlo
+                        nuevamente en unos minutos.
                     </span>
                 </div>
                 """,
                 unsafe_allow_html=True
             )
+
+    if not df_no_interesan.empty:
+        with st.expander(
+            f"🙈 Recomendaciones ocultas ({len(df_no_interesan)})"
+        ):
+            st.caption(
+                "Estas historias no volverán a recomendarse hasta restaurarlas."
+            )
+
+            for fila in df_no_interesan.itertuples(index=False):
+                columna_titulo, columna_restaurar = st.columns([3, 1])
+
+                with columna_titulo:
+                    st.write(fila.titulo or f"KDrama {fila.id}")
+
+                with columna_restaurar:
+                    if st.button(
+                        "Restaurar",
+                        key=f"restaurar_recomendacion_{fila.id}",
+                        width="stretch"
+                    ):
+                        restaurar_recomendacion(fila.id)
+                        st.session_state.mensaje_toast = (
+                            f"'{fila.titulo}' puede volver a recomendarse."
+                        )
+                        st.rerun()
+
+    st.markdown(
+        """
+        <div class="animeverse-preview">
+            <span class="animeverse-eyebrow">PRÓXIMO UNIVERSO</span>
+            <div class="animeverse-title">🌸 AnimeVerse</div>
+            <p>
+                Un espacio separado para el catálogo, los vistos y las
+                recomendaciones de anime de July.
+            </p>
+            <div class="animeverse-features">
+                <span>🎨 Fondo propio</span>
+                <span>📺 Catálogo independiente</span>
+                <span>✨ Nuevas recomendaciones</span>
+            </div>
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
 
 # PESTAÑA 3: BUSCADOR MEJORADO (CON FORMULARIO)
 if pagina_actual == "🔍 Buscar Serie":

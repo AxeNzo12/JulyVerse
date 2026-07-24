@@ -80,14 +80,18 @@ def _obtener_id(drama):
 def _agregar_candidato(
     candidatos,
     drama,
-    ids_vistos,
+    ids_excluidos,
     puntos_origen=0,
     semilla="",
     actor=""
 ):
     id_drama = _obtener_id(drama)
 
-    if not id_drama or id_drama in ids_vistos or not _es_serie_coreana(drama):
+    if (
+        not id_drama
+        or id_drama in ids_excluidos
+        or not _es_serie_coreana(drama)
+    ):
         return
 
     if id_drama not in candidatos:
@@ -126,8 +130,31 @@ def _obtener_generos_drama(drama):
     return [int(id_genero) for id_genero in ids_generos]
 
 
-def generar_recomendaciones(df_vistos, limite=6):
+def _obtener_nivel_afinidad(puntuacion):
+    if puntuacion >= 12:
+        return {
+            "texto": "Muy compatible",
+            "icono": "💜",
+            "clase": "high",
+        }
+
+    if puntuacion >= 10:
+        return {
+            "texto": "Buena opción",
+            "icono": "✨",
+            "clase": "medium",
+        }
+
+    return {
+        "texto": "Podría gustarle",
+        "icono": "🌙",
+        "clase": "soft",
+    }
+
+
+def generar_recomendaciones(df_vistos, limite=6, ids_ocultos=None):
     semillas = _seleccionar_semillas(df_vistos)
+    ids_ocultos = [] if ids_ocultos is None else ids_ocultos
 
     if not semillas:
         return {
@@ -140,6 +167,10 @@ def generar_recomendaciones(df_vistos, limite=6):
     ids_vistos = {
         int(id_kdrama)
         for id_kdrama in _normalizar_vistos(df_vistos)["id"].tolist()
+    }
+    ids_excluidos = ids_vistos | {
+        int(id_kdrama)
+        for id_kdrama in ids_ocultos
     }
 
     candidatos = {}
@@ -183,7 +214,7 @@ def generar_recomendaciones(df_vistos, limite=6):
             _agregar_candidato(
                 candidatos,
                 drama,
-                ids_vistos,
+                ids_excluidos,
                 puntos_origen=bonus_similar,
                 semilla=titulo_semilla,
             )
@@ -217,7 +248,7 @@ def generar_recomendaciones(df_vistos, limite=6):
         _agregar_candidato(
             candidatos,
             drama,
-            ids_vistos,
+            ids_excluidos,
             puntos_origen=1.25,
         )
 
@@ -231,7 +262,7 @@ def generar_recomendaciones(df_vistos, limite=6):
             _agregar_candidato(
                 candidatos,
                 drama,
-                ids_vistos,
+                ids_excluidos,
                 puntos_origen=3.5,
                 actor=nombre_actor,
             )
@@ -297,6 +328,7 @@ def generar_recomendaciones(df_vistos, limite=6):
 
         drama["_motivos"] = motivos[:2]
         drama["_puntuacion_recomendacion"] = round(puntuacion, 2)
+        drama["_afinidad"] = _obtener_nivel_afinidad(puntuacion)
         recomendaciones.append(drama)
 
     recomendaciones.sort(
