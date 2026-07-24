@@ -2,6 +2,7 @@ import os
 
 import pandas as pd
 
+from services.github_backup import respaldar_archivo
 
 ARCHIVO_NO_INTERESAN = "no_me_interesan.csv"
 COLUMNAS_NO_INTERESAN = ["id", "titulo"]
@@ -46,6 +47,7 @@ def agregar_no_interesa(id_kdrama, titulo):
         df = pd.concat([df, nuevo], ignore_index=True)
 
     df.to_csv(ARCHIVO_NO_INTERESAN, index=False)
+    respaldar_archivo(ARCHIVO_NO_INTERESAN)
 
 
 def restaurar_recomendacion(id_kdrama):
@@ -53,3 +55,4 @@ def restaurar_recomendacion(id_kdrama):
     id_kdrama = int(float(id_kdrama))
     df = df[df["id"] != id_kdrama]
     df.to_csv(ARCHIVO_NO_INTERESAN, index=False)
+    respaldar_archivo(ARCHIVO_NO_INTERESAN)

@@ -1,6 +1,8 @@
 import os
 import pandas as pd
 
+from services.github_backup import respaldar_archivo
+
 ARCHIVO_POR_VER = "por_ver.csv"
 
 
@@ -42,6 +44,7 @@ def agregar_por_ver(id_kdrama, titulo, poster):
         df = pd.concat([df, nuevo], ignore_index=True)
 
     df.to_csv(ARCHIVO_POR_VER, index=False)
+    respaldar_archivo(ARCHIVO_POR_VER)
 
 
 def eliminar_por_ver(id_kdrama):
@@ -53,3 +56,4 @@ def eliminar_por_ver(id_kdrama):
         df = df[df["id"] != id_kdrama]
 
     df.to_csv(ARCHIVO_POR_VER, index=False)
+    respaldar_archivo(ARCHIVO_POR_VER)

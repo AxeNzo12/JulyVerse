@@ -21,6 +21,10 @@ from services.recommendation_preferences import (
     cargar_no_interesan,
     restaurar_recomendacion,
 )
+from services.github_backup import (
+    inicializar_datos_github,
+    respaldar_archivo,
+)
 from utils.recuerdos import (
     imagen_a_base64,
     obtener_recuerdo_por_indice,
@@ -58,6 +62,23 @@ cargar_css()
 
 if not mostrar_acceso():
     st.stop()
+
+if not st.session_state.get("respaldo_github_inicializado", False):
+    with st.spinner("Recuperando el universo de July..."):
+        respaldo_correcto, mensaje_respaldo = inicializar_datos_github()
+
+    st.session_state.respaldo_github_inicializado = True
+
+    if respaldo_correcto:
+        st.session_state.pop("error_respaldo_github", None)
+    else:
+        st.session_state.error_respaldo_github = mensaje_respaldo
+
+if "error_respaldo_github" in st.session_state:
+    st.warning(
+        "JulyVerse funciona, pero el respaldo privado necesita atención. "
+        f"{st.session_state.error_respaldo_github}"
+    )
 
 # Muestra la notificación animada si hay un mensaje pendiente
 if 'mensaje_toast' in st.session_state:
@@ -159,6 +180,7 @@ with st.sidebar:
                     ]
 
                     df_importado.to_csv("mis_kdramas.csv", index=False)
+                    respaldar_archivo("mis_kdramas.csv")
 
                     st.session_state.mensaje_toast = "Respaldo restaurado correctamente 💜"
                     st.session_state.pagina_pendiente = "✨ Mis KDramas Vistos"
@@ -213,6 +235,7 @@ with st.sidebar:
                     )
 
                     df_por_ver_importado.to_csv("por_ver.csv", index=False)
+                    respaldar_archivo("por_ver.csv")
 
                     st.session_state.mensaje_toast = "Lista Por Ver restaurada correctamente 💫"
                     st.session_state.pagina_pendiente = "💫 Por Ver"
@@ -288,6 +311,7 @@ with st.sidebar:
                         "no_me_interesan.csv",
                         index=False
                     )
+                    respaldar_archivo("no_me_interesan.csv")
 
                     st.session_state.mensaje_toast = (
                         "Preferencias restauradas correctamente 🙈"

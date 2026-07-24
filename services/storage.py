@@ -1,6 +1,8 @@
 import os
 import pandas as pd
 
+from services.github_backup import respaldar_archivo
+
 ARCHIVO_CSV = "mis_kdramas.csv"
 
 
@@ -68,6 +70,7 @@ def actualizar_visto(id_kdrama, titulo, poster, visto):
             df = pd.DataFrame(columns=["id", "titulo", "poster", "recuerdo", "favorito", "calificacion"])
 
     df.to_csv(ARCHIVO_CSV, index=False)
+    respaldar_archivo(ARCHIVO_CSV)
 
 
 def actualizar_recuerdo(id_kdrama, recuerdo):
@@ -86,6 +89,7 @@ def actualizar_recuerdo(id_kdrama, recuerdo):
     df.loc[df["id"] == id_kdrama, "recuerdo"] = recuerdo
     
     df.to_csv(ARCHIVO_CSV, index=False)
+    respaldar_archivo(ARCHIVO_CSV)
 
 def actualizar_favorito(id_kdrama, favorito):
     df = cargar_vistos()
@@ -100,6 +104,7 @@ def actualizar_favorito(id_kdrama, favorito):
     df.loc[df["id"] == id_kdrama, "favorito"] = bool(favorito)
 
     df.to_csv(ARCHIVO_CSV, index=False)
+    respaldar_archivo(ARCHIVO_CSV)
     
 def actualizar_calificacion(id_kdrama, calificacion):
     df = cargar_vistos()
@@ -115,3 +120,4 @@ def actualizar_calificacion(id_kdrama, calificacion):
     df.loc[df["id"] == id_kdrama, "calificacion"] = calificacion
 
     df.to_csv(ARCHIVO_CSV, index=False)
+    respaldar_archivo(ARCHIVO_CSV)
