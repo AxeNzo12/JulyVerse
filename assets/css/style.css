@@ -1537,6 +1537,11 @@ img:hover {
         gap: 8px !important;
     }
 
+    div[data-testid="stHorizontalBlock"]:has(.metric-card) {
+        grid-auto-rows: minmax(116px, auto);
+        row-gap: 12px !important;
+    }
+
     div[data-testid="stHorizontalBlock"]:has(.metric-card)
       > div[data-testid="stColumn"],
     div[data-testid="stHorizontalBlock"]:has(div[data-testid="stMetric"])
@@ -1547,7 +1552,7 @@ img:hover {
     }
 
     div[data-testid="stHorizontalBlock"]:has(.metric-card) .metric-card {
-        height: 100%;
+        height: auto;
         min-height: 116px;
         padding: 11px 12px;
     }
