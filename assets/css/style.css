@@ -317,7 +317,7 @@ div[data-testid="stMetric"]:hover {
 /* Navegación con radio: estilo pestañas */
 div[role="radiogroup"] {
     display: grid !important;
-    grid-template-columns: repeat(6, minmax(0, 1fr));
+    grid-template-columns: repeat(7, minmax(0, 1fr));
     align-items: stretch;
     gap: 10px;
     padding: 8px 0 12px 0;
@@ -366,7 +366,7 @@ div[role="radiogroup"] label:has(input:checked) p {
 
 @media (max-width: 1100px) {
     div[role="radiogroup"] {
-        grid-template-columns: repeat(3, minmax(0, 1fr));
+        grid-template-columns: repeat(4, minmax(0, 1fr));
     }
 }
 
@@ -399,6 +399,10 @@ div[role="radiogroup"] label:has(input:checked) p {
 
     div[role="radiogroup"] label p {
         font-size: 12px;
+    }
+
+    div[role="radiogroup"] label:last-child {
+        grid-column: 2;
     }
 }
 
@@ -1471,6 +1475,166 @@ div[class*="st-key-watchlist_item_"] div[class*="st-key-quitar_por_ver_page_"] b
 }
 
 /* ================================
+   RECOMENDACIONES PARA JULY
+   ================================ */
+
+.recommendation-profile {
+    display: flex;
+    align-items: flex-start;
+    gap: 15px;
+    max-width: 980px;
+    margin: 8px auto 24px;
+    padding: 18px 20px;
+    border: 1px solid rgba(255, 255, 255, 0.62);
+    border-radius: 24px;
+    background: linear-gradient(
+        135deg,
+        rgba(255, 255, 255, 0.58),
+        rgba(237, 233, 254, 0.42)
+    );
+    box-shadow: 0 8px 20px rgba(76, 29, 149, 0.08);
+}
+
+.recommendation-profile-icon {
+    display: flex;
+    flex: 0 0 50px;
+    align-items: center;
+    justify-content: center;
+    width: 50px;
+    height: 50px;
+    border: 1px solid rgba(124, 58, 237, 0.18);
+    border-radius: 50%;
+    background: rgba(237, 233, 254, 0.84);
+    font-size: 24px;
+}
+
+.recommendation-profile-content {
+    min-width: 0;
+}
+
+.recommendation-profile-content strong {
+    display: block;
+    color: #4a044e;
+    font-size: 19px;
+    font-weight: 800;
+}
+
+.recommendation-profile-content > span {
+    display: block;
+    margin-top: 3px;
+    color: #6b4e71;
+    font-size: 14px;
+}
+
+.recommendation-profile-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 7px;
+    margin-top: 12px;
+}
+
+.recommendation-profile-chip,
+.recommendation-reason {
+    display: inline-flex;
+    align-items: center;
+    border: 1px solid rgba(124, 58, 237, 0.14);
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.62);
+    color: #65328a;
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 1.25;
+}
+
+.recommendation-profile-chip {
+    padding: 6px 10px;
+}
+
+div[class*="st-key-recommendation_item_"] {
+    margin-bottom: 20px;
+}
+
+.recommendation-match {
+    display: flex;
+    min-height: 96px;
+    margin-bottom: 10px;
+    padding: 13px 12px;
+    border: 1px solid rgba(255, 255, 255, 0.58);
+    border-radius: 18px;
+    background: linear-gradient(
+        145deg,
+        rgba(255, 255, 255, 0.54),
+        rgba(245, 240, 255, 0.42)
+    );
+    flex-direction: column;
+    justify-content: center;
+    text-align: center;
+}
+
+.recommendation-match-title {
+    color: #4a044e;
+    font-size: 14px;
+    font-weight: 800;
+}
+
+.recommendation-reasons {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 6px;
+    margin-top: 8px;
+}
+
+.recommendation-reason {
+    padding: 5px 9px;
+}
+
+.recommendation-empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    max-width: 620px;
+    margin: 22px auto 8px;
+    padding: 30px 24px;
+    border: 1px solid rgba(255, 255, 255, 0.60);
+    border-radius: 24px;
+    background: linear-gradient(
+        145deg,
+        rgba(255, 255, 255, 0.54),
+        rgba(245, 240, 255, 0.40)
+    );
+    box-shadow: 0 8px 20px rgba(76, 29, 149, 0.08);
+    text-align: center;
+}
+
+.recommendation-empty-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 50px;
+    height: 50px;
+    margin-bottom: 12px;
+    border: 1px solid rgba(124, 58, 237, 0.16);
+    border-radius: 50%;
+    background: rgba(237, 233, 254, 0.82);
+    font-size: 24px;
+}
+
+.recommendation-empty-state strong {
+    color: #4a044e;
+    font-size: 19px;
+    font-weight: 800;
+}
+
+.recommendation-empty-state span {
+    max-width: 440px;
+    margin-top: 6px;
+    color: #6b4e71;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+/* ================================
    PERFORMANCE PATCH JULYVERSE
    ================================ */
 
@@ -1765,6 +1929,48 @@ img:hover {
     }
 
     .search-empty-state {
+        margin-top: 16px;
+        padding: 24px 18px;
+    }
+
+    div[data-testid="stHorizontalBlock"]:has(
+        div[class*="st-key-recommendation_item_"]
+    ) {
+        flex-direction: column !important;
+        gap: 0.75rem !important;
+    }
+
+    div[data-testid="stHorizontalBlock"]:has(
+        div[class*="st-key-recommendation_item_"]
+    ) > div[data-testid="stColumn"] {
+        width: 100% !important;
+        min-width: 100% !important;
+        flex: 1 1 100% !important;
+    }
+
+    div[class*="st-key-recommendation_item_"] {
+        width: min(100%, 370px);
+        max-width: 370px;
+        margin: 0 auto 16px;
+    }
+
+    .recommendation-profile {
+        align-items: center;
+        margin-top: 4px;
+        padding: 17px 16px;
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .recommendation-profile-chips {
+        justify-content: center;
+    }
+
+    .recommendation-match {
+        min-height: auto;
+    }
+
+    .recommendation-empty-state {
         margin-top: 16px;
         padding: 24px 18px;
     }

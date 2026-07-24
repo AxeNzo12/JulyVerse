@@ -14,6 +14,8 @@ from components.stats_panel import mostrar_estadisticas
 from services.watchlist import cargar_por_ver, eliminar_por_ver
 from components.watchlist_card import mostrar_por_ver_card
 from components.favorite_card import mostrar_favorito
+from components.recommendation_card import mostrar_recomendacion
+from services.recommendations import generar_recomendaciones
 from utils.recuerdos import (
     imagen_a_base64,
     obtener_recuerdo_por_indice,
@@ -232,6 +234,7 @@ if fecha_especial:
 
 OPCIONES_PAGINA = [
     "📺 Catálogo",
+    "💜 Para July",
     "🔍 Buscar Serie",
     "✨ Mis KDramas Vistos",
     "⭐ Favoritos",
@@ -431,8 +434,114 @@ if pagina_actual == "📺 Catálogo":
     st.divider()
 
     mostrar_paginacion_catalogo("inferior")
-    
-# PESTAÑA 2: BUSCADOR MEJORADO (CON FORMULARIO)
+
+# PESTAÑA 2: RECOMENDACIONES PERSONALIZADAS
+if pagina_actual == "💜 Para July":
+    st.subheader("💜 Recomendaciones para July")
+    st.caption(
+        "Historias elegidas según sus calificaciones, favoritos, géneros "
+        "y actores que ya ha visto."
+    )
+
+    if df_vistos.empty:
+        st.markdown(
+            """
+            <div class="recommendation-empty-state">
+                <div class="recommendation-empty-icon">💜</div>
+                <strong>Primero conozcamos los gustos de July</strong>
+                <span>
+                    Cuando marque algunos KDramas como vistos, aquí aparecerán
+                    recomendaciones pensadas especialmente para ella.
+                </span>
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
+
+    else:
+        with st.spinner("Conectando historias que podrían gustarle a July..."):
+            resultado_recomendaciones = generar_recomendaciones(
+                df_vistos,
+                limite=6
+            )
+
+        recomendaciones = resultado_recomendaciones["recomendaciones"]
+
+        if recomendaciones:
+            semillas_seguras = [
+                html.escape(titulo)
+                for titulo in resultado_recomendaciones["semillas"][:3]
+            ]
+            generos_seguros = [
+                html.escape(genero)
+                for genero in resultado_recomendaciones["generos"][:3]
+            ]
+            actores_seguros = [
+                html.escape(actor)
+                for actor in resultado_recomendaciones["actores"][:3]
+            ]
+
+            chips_generos = "".join(
+                f'<span class="recommendation-profile-chip">🎭 {genero}</span>'
+                for genero in generos_seguros
+            )
+            chips_actores = "".join(
+                f'<span class="recommendation-profile-chip">🎬 {actor}</span>'
+                for actor in actores_seguros
+            )
+            base_recomendaciones = ", ".join(semillas_seguras)
+
+            st.markdown(
+                f"""
+                <div class="recommendation-profile">
+                    <div class="recommendation-profile-icon">🌌</div>
+                    <div class="recommendation-profile-content">
+                        <strong>El mapa de gustos de July</strong>
+                        <span>Basado en {base_recomendaciones}</span>
+                        <div class="recommendation-profile-chips">
+                            {chips_generos}
+                            {chips_actores}
+                        </div>
+                    </div>
+                </div>
+                """,
+                unsafe_allow_html=True
+            )
+
+            for inicio_fila in range(0, len(recomendaciones), 3):
+                fila_recomendaciones = recomendaciones[
+                    inicio_fila:inicio_fila + 3
+                ]
+                columnas_recomendaciones = st.columns(3)
+
+                for indice, drama in enumerate(fila_recomendaciones):
+                    with columnas_recomendaciones[indice]:
+                        mostrar_recomendacion(
+                            drama,
+                            lista_vistos_ids,
+                            lista_por_ver_ids
+                        )
+
+            st.caption(
+                "Las recomendaciones mejoran cuando July califica más historias."
+            )
+
+        else:
+            st.markdown(
+                """
+                <div class="recommendation-empty-state">
+                    <div class="recommendation-empty-icon">✨</div>
+                    <strong>No pude preparar recomendaciones ahora</strong>
+                    <span>
+                        Revisa la conexión con TMDB e inténtalo nuevamente
+                        en unos minutos.
+                    </span>
+                </div>
+                """,
+                unsafe_allow_html=True
+            )
+
+# PESTAÑA 3: BUSCADOR MEJORADO (CON FORMULARIO)
 if pagina_actual == "🔍 Buscar Serie":
     st.subheader("Encuentra una serie específica")
     st.caption("Busca por título y explora los resultados disponibles en TMDB.")
@@ -496,7 +605,7 @@ if pagina_actual == "🔍 Buscar Serie":
             unsafe_allow_html=True
         )
 
-# PESTAÑA 3: LISTA PERSONAL CON MINIATURAS Y BOTÓN PARA QUITAR
+# PESTAÑA 4: LISTA PERSONAL CON MINIATURAS Y BOTÓN PARA QUITAR
 if pagina_actual == "✨ Mis KDramas Vistos":
     st.subheader("Tu historial de series terminadas")
 
@@ -709,7 +818,7 @@ if pagina_actual == "✨ Mis KDramas Vistos":
     else:
         st.info("Aún no has marcado ningún KDrama como visto. ¡Explora el catálogo o usa el buscador!")
 
-# PESTAÑA 4: FAVORITOS
+# PESTAÑA 5: FAVORITOS
 if pagina_actual == "⭐ Favoritos":
     st.subheader("⭐ Tus KDramas favoritos")
 
@@ -734,7 +843,7 @@ if pagina_actual == "⭐ Favoritos":
     else:
         st.info("Aún no has marcado ningún KDrama como favorito.")
 
-# PESTAÑA 5: POR VER
+# PESTAÑA 6: POR VER
 if pagina_actual == "💫 Por Ver":
     st.subheader("💫 KDramas por ver")
 
@@ -850,7 +959,7 @@ if pagina_actual == "💫 Por Ver":
             unsafe_allow_html=True
         )
 
-# PESTAÑA 6: ESTADÍSTICAS
+# PESTAÑA 7: ESTADÍSTICAS
 if pagina_actual == "📊 Estadísticas":
     st.subheader("📊 Estadísticas de JulyVerse")
 

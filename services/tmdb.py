@@ -68,3 +68,86 @@ def buscar_kdrama(query):
     except requests.exceptions.RequestException:
         st.error("No pude realizar la búsqueda en TMDB. Intenta de nuevo en unos minutos.")
         return []
+
+
+@st.cache_data(show_spinner=False, ttl=3600)
+def _consultar_perfil_kdrama(id_kdrama):
+    url = f"{BASE_URL}/tv/{int(id_kdrama)}"
+
+    parametros = {
+        "api_key": obtener_api_key(),
+        "language": "es-MX",
+        "append_to_response": "similar,aggregate_credits"
+    }
+
+    respuesta = requests.get(url, params=parametros, timeout=10)
+    respuesta.raise_for_status()
+    return respuesta.json()
+
+
+def obtener_perfil_kdrama(id_kdrama):
+    """Obtiene detalles, similares y reparto completo en una sola consulta."""
+    try:
+        return _consultar_perfil_kdrama(id_kdrama)
+
+    except requests.exceptions.RequestException:
+        return {}
+
+
+@st.cache_data(show_spinner=False, ttl=3600)
+def _consultar_trabajos_actor(id_actor):
+    url = f"{BASE_URL}/person/{int(id_actor)}/combined_credits"
+
+    parametros = {
+        "api_key": obtener_api_key(),
+        "language": "es-MX"
+    }
+
+    respuesta = requests.get(url, params=parametros, timeout=10)
+    respuesta.raise_for_status()
+    return respuesta.json()
+
+
+def obtener_trabajos_actor(id_actor):
+    """Obtiene películas y series relacionadas con una persona."""
+    try:
+        return _consultar_trabajos_actor(id_actor)
+
+    except requests.exceptions.RequestException:
+        return {}
+
+
+@st.cache_data(show_spinner=False, ttl=3600)
+def _consultar_kdramas_por_generos(ids_generos):
+    ids_generos = tuple(int(id_genero) for id_genero in ids_generos)
+
+    url = f"{BASE_URL}/discover/tv"
+
+    parametros = {
+        "api_key": obtener_api_key(),
+        "with_origin_country": "KR",
+        "with_genres": "|".join(str(id_genero) for id_genero in ids_generos),
+        "sort_by": "popularity.desc",
+        "vote_count.gte": 20,
+        "include_adult": False,
+        "language": "es-MX",
+        "page": 1
+    }
+
+    respuesta = requests.get(url, params=parametros, timeout=10)
+    respuesta.raise_for_status()
+    return respuesta.json().get("results", [])
+
+
+def obtener_kdramas_por_generos(ids_generos):
+    """Busca series coreanas relacionadas con los géneros preferidos."""
+    ids_generos = tuple(int(id_genero) for id_genero in ids_generos)
+
+    if not ids_generos:
+        return []
+
+    try:
+        return _consultar_kdramas_por_generos(ids_generos)
+
+    except requests.exceptions.RequestException:
+        return []
