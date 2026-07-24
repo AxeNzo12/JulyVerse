@@ -477,6 +477,16 @@ button[data-testid="stExpandSidebarButton"]:hover {
     color: white !important;
 }
 
+[data-testid="stSidebarCollapseButton"] button span,
+button[data-testid="stExpandSidebarButton"] span {
+    color: #7c3aed !important;
+}
+
+[data-testid="stSidebarCollapseButton"] button:hover span,
+button[data-testid="stExpandSidebarButton"]:hover span {
+    color: white !important;
+}
+
 /* Inputs, selectbox, text area */
 textarea, input, div[data-baseweb="select"] {
     border-radius: 16px !important;
@@ -1505,5 +1515,139 @@ img:hover {
     .watchlist-empty-state {
         margin-top: 16px;
         padding: 24px 18px;
+    }
+}
+
+/* ================================
+   AJUSTES GENERALES PARA CELULAR
+   ================================ */
+.stats-best-rated-marker {
+    display: none;
+}
+
+@media (max-width: 700px) {
+    .main .block-container {
+        padding: 1.25rem 1rem 2.5rem;
+    }
+
+    div[data-testid="stHorizontalBlock"]:has(.metric-card),
+    div[data-testid="stHorizontalBlock"]:has(div[data-testid="stMetric"]) {
+        display: grid !important;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 8px !important;
+    }
+
+    div[data-testid="stHorizontalBlock"]:has(.metric-card)
+      > div[data-testid="stColumn"],
+    div[data-testid="stHorizontalBlock"]:has(div[data-testid="stMetric"])
+      > div[data-testid="stColumn"] {
+        width: auto !important;
+        min-width: 0 !important;
+        flex: none !important;
+    }
+
+    div[data-testid="stHorizontalBlock"]:has(.metric-card) .metric-card {
+        height: 100%;
+        min-height: 116px;
+        padding: 11px 12px;
+    }
+
+    div[data-testid="stHorizontalBlock"]:has(.metric-card) .metric-title {
+        font-size: 13px;
+    }
+
+    div[data-testid="stHorizontalBlock"]:has(.metric-card) .metric-description {
+        font-size: 11px;
+    }
+
+    div[data-testid="stHorizontalBlock"]:has(div[data-testid="stMetric"])
+      div[data-testid="stMetric"] {
+        min-height: 116px;
+        padding: 14px !important;
+    }
+
+    div[data-testid="stHorizontalBlock"]:has(div[data-testid="stMetric"])
+      [data-testid="stMetricLabel"] p {
+        font-size: 12px;
+    }
+
+    div[data-testid="stHorizontalBlock"]:has(div[data-testid="stMetric"])
+      [data-testid="stMetricValue"] {
+        font-size: 27px;
+    }
+
+    div[data-testid="stHorizontalBlock"]:has(
+        div[class*="st-key-catalogo_anterior_"]
+    ) {
+        display: grid !important;
+        grid-template-columns: 1fr 0.8fr 1fr;
+        align-items: center;
+        gap: 7px !important;
+    }
+
+    div[data-testid="stHorizontalBlock"]:has(
+        div[class*="st-key-catalogo_anterior_"]
+    )
+      > div[data-testid="stColumn"] {
+        width: auto !important;
+        min-width: 0 !important;
+        flex: none !important;
+    }
+
+    div[data-testid="stHorizontalBlock"]:has(
+        div[class*="st-key-catalogo_anterior_"]
+    ) button {
+        min-height: 38px;
+        padding: 6px 7px !important;
+    }
+
+    div[data-testid="stHorizontalBlock"]:has(
+        div[class*="st-key-catalogo_anterior_"]
+    ) button p {
+        font-size: 12px;
+        white-space: nowrap;
+    }
+
+    div[data-testid="stHorizontalBlock"]:has(.stats-best-rated-marker) {
+        max-width: 370px;
+        margin: 0 auto 6px;
+        padding: 18px;
+        border: 1px solid rgba(255, 255, 255, 0.56);
+        border-radius: 22px;
+        background: rgba(255, 255, 255, 0.42);
+        text-align: center;
+        flex-direction: column !important;
+        gap: 10px !important;
+    }
+
+    div[data-testid="stHorizontalBlock"]:has(.stats-best-rated-marker)
+      > div[data-testid="stColumn"] {
+        width: 100% !important;
+        min-width: 100% !important;
+        flex: 1 1 100% !important;
+    }
+
+    div[data-testid="stHorizontalBlock"]:has(.stats-best-rated-marker)
+      [data-testid="stImage"] {
+        display: flex;
+        justify-content: center;
+    }
+
+    div[data-testid="stHorizontalBlock"]:has(.stats-best-rated-marker) h3,
+    div[data-testid="stHorizontalBlock"]:has(.stats-best-rated-marker) p {
+        text-align: center;
+    }
+
+    [data-testid="stSidebar"] [data-testid="stImage"] img {
+        display: block;
+        width: auto !important;
+        max-width: 185px !important;
+        max-height: 210px;
+        margin: 0 auto;
+        object-fit: contain;
+    }
+
+    [data-testid="stSidebar"] .block-container {
+        padding-top: 1.25rem;
     }
 }

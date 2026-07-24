@@ -83,6 +83,11 @@ def mostrar_estadisticas(df_vistos):
         col_img, col_info = st.columns([1, 4])
 
         with col_img:
+            st.markdown(
+                '<span class="stats-best-rated-marker"></span>',
+                unsafe_allow_html=True
+            )
+
             if pd.notna(mejor["poster"]) and mejor["poster"]:
                 st.image(IMG_URL_SMALL + mejor["poster"], width=120)
             else:
