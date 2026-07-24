@@ -57,7 +57,13 @@ def buscar_kdrama(query):
         respuesta = requests.get(url, params=parametros, timeout=10)
         respuesta.raise_for_status()
 
-        return respuesta.json().get("results", [])
+        resultados = respuesta.json().get("results", [])
+
+        return [
+            serie
+            for serie in resultados
+            if "KR" in serie.get("origin_country", [])
+        ]
 
     except requests.exceptions.RequestException:
         st.error("No pude realizar la búsqueda en TMDB. Intenta de nuevo en unos minutos.")

@@ -3,7 +3,7 @@ import html
 import pandas as pd
 import streamlit as st
 
-from services.tmdb import IMG_URL
+from services.tmdb import IMG_URL_SMALL
 from services.storage import actualizar_favorito
 
 
@@ -13,7 +13,7 @@ def mostrar_favorito(row, id_drama_favorito, limpiar_estado_favorito):
     titulo_seguro = html.escape(titulo)
 
     if poster:
-        imagen = IMG_URL + poster
+        imagen = IMG_URL_SMALL + poster
     else:
         imagen = "https://placehold.co/500x750/d8b4e2/4a044e.png?text=JulyVerse"
 
@@ -33,28 +33,30 @@ def mostrar_favorito(row, id_drama_favorito, limpiar_estado_favorito):
 
     tarjeta_html = (
         '<div class="favorite-card">'
+        '<div class="favorite-badge">⭐ Favorita de July</div>'
         '<div class="favorite-poster-wrapper">'
-        f'<img src="{imagen}" class="favorite-poster">'
+        f'<img src="{imagen}" class="favorite-poster" loading="lazy">'
         '</div>'
         '<div class="favorite-info">'
-        f'<div class="favorite-title">⭐ {titulo_seguro}</div>'
+        f'<div class="favorite-title">{titulo_seguro}</div>'
         f'{calificacion_html}'
         f'{recuerdo_html}'
         '</div>'
         '</div>'
     )
 
-    st.markdown(tarjeta_html, unsafe_allow_html=True)
+    with st.container(key=f"favorite_item_{id_drama_favorito}"):
+        st.markdown(tarjeta_html, unsafe_allow_html=True)
 
-    if st.button(
-        "Quitar favorito",
-        key=f"quitar_fav_{id_drama_favorito}",
-        width="stretch"
-    ):
-        actualizar_favorito(id_drama_favorito, False)
+        if st.button(
+            "☆ Quitar de favoritos",
+            key=f"quitar_fav_{id_drama_favorito}",
+            width="stretch"
+        ):
+            actualizar_favorito(id_drama_favorito, False)
 
-        limpiar_estado_favorito(id_drama_favorito)
+            limpiar_estado_favorito(id_drama_favorito)
 
-        st.session_state.mensaje_toast = f"Quitaste '{titulo}' de favoritos."
-        st.session_state.pagina_pendiente = "⭐ Favoritos"
-        st.rerun()
+            st.session_state.mensaje_toast = f"Quitaste '{titulo}' de favoritos."
+            st.session_state.pagina_pendiente = "⭐ Favoritos"
+            st.rerun()

@@ -1,3 +1,4 @@
+import html
 import streamlit as st
 import pandas as pd
 from pathlib import Path
@@ -407,9 +408,10 @@ if pagina_actual == "📺 Catálogo":
     with col_filtro:
         # Menú desplegable para los géneros
         genero_seleccionado = st.selectbox(
-            "Filtrar por género:", 
-            list(GENEROS_TMDB.keys()), 
-            on_change=reset_pagina
+            "🎭 Género",
+            list(GENEROS_TMDB.keys()),
+            on_change=reset_pagina,
+            key="filtro_genero_catalogo"
         )
     
     # Traducimos el texto seleccionado a su ID numérico
@@ -432,14 +434,22 @@ if pagina_actual == "📺 Catálogo":
 # PESTAÑA 2: BUSCADOR MEJORADO (CON FORMULARIO)
 if pagina_actual == "🔍 Buscar Serie":
     st.subheader("Encuentra una serie específica")
+    st.caption("Busca por título y explora los resultados disponibles en TMDB.")
     
     # Creamos un formulario que agrupa la caja de texto y el botón
     with st.form(key='formulario_busqueda', clear_on_submit=False):
-        busqueda = st.text_input("Escribe el nombre de la serie:", label_visibility="collapsed")
+        busqueda = st.text_input(
+            "Escribe el nombre de la serie:",
+            placeholder="Escribe el nombre de un KDrama...",
+            label_visibility="collapsed"
+        )
 
         # Al estar dentro del form, el botón se activa automáticamente con Enter.
         # Mantenerlo como hijo directo evita un aviso fugaz de Streamlit.
-        submit_button = st.form_submit_button(label="🔍 Buscar", width="stretch")
+        submit_button = st.form_submit_button(
+            label="🔍 Buscar en TMDB",
+            width="content"
+        )
             
         if submit_button:
             if busqueda:
@@ -480,40 +490,77 @@ if pagina_actual == "✨ Mis KDramas Vistos":
 
         if not df_top.empty:
             with st.expander("👑 Top de July"):
+                st.markdown(
+                    """
+                    <div class="top-july-intro">
+                        <span class="top-july-intro-icon">✨</span>
+                        <div>
+                            <strong>El podio personal de July</strong>
+                            <small>Sus historias mejor calificadas del historial</small>
+                        </div>
+                    </div>
+                    """,
+                    unsafe_allow_html=True
+                )
+
                 cols_top = st.columns(3)
+                posiciones_top = [
+                    ("🥇", "Primer lugar"),
+                    ("🥈", "Segundo lugar"),
+                    ("🥉", "Tercer lugar"),
+                ]
 
                 for indice, (_, drama_top) in enumerate(df_top.iterrows()):
                     with cols_top[indice]:
-                        titulo_top = drama_top["titulo"]
+                        titulo_top = html.escape(str(drama_top["titulo"]))
                         calificacion_top = int(drama_top["calificacion"])
+                        medalla_top, posicion_top = posiciones_top[indice]
 
                         if pd.notna(drama_top["poster"]) and drama_top["poster"]:
-                            st.image(IMG_URL_SMALL + drama_top["poster"], width=120)
+                            poster_top = (
+                                f'<img src="{IMG_URL_SMALL + drama_top["poster"]}" '
+                                'class="top-july-poster" loading="lazy">'
+                            )
+                        else:
+                            poster_top = '<div class="top-july-poster-fallback">💜</div>'
 
-                        st.markdown(f"**💜 {titulo_top}**")
-                        st.caption(f"⭐ {calificacion_top}/10")
+                        st.markdown(
+                            f"""
+                            <div class="top-july-card top-july-card-{indice + 1}">
+                                <div class="top-july-medal">{medalla_top}</div>
+                                {poster_top}
+                                <div class="top-july-info">
+                                    <div class="top-july-place">{posicion_top}</div>
+                                    <div class="top-july-title">{titulo_top}</div>
+                                    <div class="top-july-score">⭐ {calificacion_top}/10</div>
+                                </div>
+                            </div>
+                            """,
+                            unsafe_allow_html=True
+                        )
 
-        filtro_vistos = st.radio(
-            "Filtrar KDramas",
-            [
-                "Todos",
-                "⭐ Favoritos",
-                "📖 Con recuerdo",
-                "📝 Sin recuerdo",
-                "🌟 Calificados",
-                "❔ Sin calificar",
-                "🏆 Mejor calificados"
-            ],
-            horizontal=True,
-            key="filtro_vistos"
-        )
-        col_buscar_vistos, col_orden_vistos = st.columns([2, 1])
+        col_buscar_vistos, col_filtro_vistos, col_orden_vistos = st.columns([2, 1, 1])
 
         with col_buscar_vistos:
             busqueda_vistos = st.text_input(
                 "Buscar en tus KDramas vistos",
                 placeholder="Escribe el nombre de una serie...",
                 key="busqueda_vistos"
+            )
+
+        with col_filtro_vistos:
+            filtro_vistos = st.selectbox(
+                "Filtrar por",
+                [
+                    "Todos",
+                    "⭐ Favoritos",
+                    "📖 Con recuerdo",
+                    "📝 Sin recuerdo",
+                    "🌟 Calificados",
+                    "❔ Sin calificar",
+                    "🏆 Mejor calificados"
+                ],
+                key="filtro_vistos"
             )
 
         with col_orden_vistos:
@@ -598,7 +645,20 @@ if pagina_actual == "✨ Mis KDramas Vistos":
         elif orden_vistos == "Menor calificación":
             df_filtrado = df_filtrado.sort_values("calificacion", ascending=True)
 
-        st.caption(f"Mostrando {len(df_filtrado)} de {len(df_vistos_actualizado)} KDramas")
+        cantidad_filtrada = len(df_filtrado)
+        cantidad_total = len(df_vistos_actualizado)
+        texto_historias = "historia terminada" if cantidad_total == 1 else "historias terminadas"
+
+        st.markdown(
+            f"""
+            <div class="watched-results-count">
+                <span class="watched-results-icon">✓</span>
+                Mostrando <strong>{cantidad_filtrada}</strong> de
+                <strong>{cantidad_total}</strong> {texto_historias}
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
 
         if not df_filtrado.empty:
             for i, row in df_filtrado.iterrows():
@@ -690,23 +750,76 @@ if pagina_actual == "💫 Por Ver":
 
         elif orden_por_ver == "Z-A":
             df_por_ver_filtrado = df_por_ver_filtrado.sort_values("titulo", ascending=False)
+
         df_por_ver_filtrado = df_por_ver_filtrado.reset_index(drop=True)
-        st.caption(
-            f"Mostrando {len(df_por_ver_filtrado)} de {len(df_por_ver_actualizado)} KDramas por ver"
+
+        cantidad_por_ver_filtrada = len(df_por_ver_filtrado)
+        cantidad_por_ver_total = len(df_por_ver_actualizado)
+        texto_pendientes = (
+            "historia pendiente"
+            if cantidad_por_ver_total == 1
+            else "historias pendientes"
+        )
+
+        st.markdown(
+            f"""
+            <div class="watchlist-results-count">
+                <span class="watchlist-results-icon">💫</span>
+                Mostrando <strong>{cantidad_por_ver_filtrada}</strong> de
+                <strong>{cantidad_por_ver_total}</strong> {texto_pendientes}
+            </div>
+            """,
+            unsafe_allow_html=True
         )
 
         if not df_por_ver_filtrado.empty:
-            columnas_por_ver = st.columns(3)
-            for i, row in df_por_ver_filtrado.iterrows():
-                id_por_ver = int(row["id"])
+            for inicio_fila in range(0, len(df_por_ver_filtrado), 3):
+                fila_por_ver = df_por_ver_filtrado.iloc[inicio_fila:inicio_fila + 3]
+                cantidad_en_fila = len(fila_por_ver)
 
-                with columnas_por_ver[i % 3]:
-                    mostrar_por_ver_card(row, id_por_ver)
+                if cantidad_en_fila == 1:
+                    columnas_por_ver = st.columns([1, 1, 1])
+                    posiciones_columnas = [1]
+
+                elif cantidad_en_fila == 2:
+                    columnas_por_ver = st.columns([0.5, 1, 1, 0.5])
+                    posiciones_columnas = [1, 2]
+
+                else:
+                    columnas_por_ver = st.columns(3)
+                    posiciones_columnas = [0, 1, 2]
+
+                for posicion, (_, row) in enumerate(fila_por_ver.iterrows()):
+                    id_por_ver = int(row["id"])
+
+                    with columnas_por_ver[posiciones_columnas[posicion]]:
+                        mostrar_por_ver_card(row, id_por_ver)
         else:
-            st.info("No hay KDramas que coincidan con tu búsqueda.")
+            st.markdown(
+                """
+                <div class="watchlist-empty-state">
+                    <div class="watchlist-empty-icon">🔎</div>
+                    <strong>No encontramos esa historia</strong>
+                    <span>Prueba con otro título o limpia la búsqueda.</span>
+                </div>
+                """,
+                unsafe_allow_html=True
+            )
 
     else:
-        st.info("Aún no tienes KDramas guardados para ver después.")
+        st.markdown(
+            """
+            <div class="watchlist-empty-state">
+                <div class="watchlist-empty-icon">💫</div>
+                <strong>Tu lista Por Ver está esperando</strong>
+                <span>
+                    Explora el catálogo y guarda aquí las historias
+                    que quieras descubrir después.
+                </span>
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
 
 # PESTAÑA 6: ESTADÍSTICAS
 if pagina_actual == "📊 Estadísticas":

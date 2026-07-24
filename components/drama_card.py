@@ -76,46 +76,48 @@ def mostrar_tarjeta(drama, prefijo_key, lista_vistos_ids, lista_por_ver_ids=None
 
     st.markdown(tarjeta_html, unsafe_allow_html=True)
 
-    texto_boton_visto = "✅ Ya la viste" if visto_actual else "✓ Marcar como vista"
-    ayuda_boton_visto = (
-        "Haz clic para quitarla de tus KDramas vistos."
-        if visto_actual
-        else "Haz clic para agregarla a tus KDramas vistos."
-    )
-
-    if st.button(
-        texto_boton_visto,
-        key=f"catalogo_visto_{prefijo_key}_{id_kdrama}",
-        type="primary" if visto_actual else "secondary",
-        help=ayuda_boton_visto,
-        width="stretch"
-    ):
-        visto_nuevo = not visto_actual
-
-        actualizar_visto(
-            id_kdrama=id_kdrama,
-            titulo=titulo,
-            poster=poster,
-            visto=visto_nuevo
-        )
-
-        if visto_nuevo:
-            eliminar_por_ver(id_kdrama)
-            st.session_state.mensaje_toast = f"Agregaste '{titulo}' a tus KDramas vistos 💜"
-            st.session_state.pagina_pendiente = "✨ Mis KDramas Vistos"
-        else:
-            st.session_state.mensaje_toast = f"Quitaste '{titulo}' de tus KDramas vistos."
-
-        st.rerun()
-
     if visto_actual:
         st.button(
-            "💜 En tus vistos",
+            "✅ Ya la viste",
             key=f"catalogo_estado_visto_{prefijo_key}_{id_kdrama}",
             width="stretch",
             disabled=True
         )
+
+        if st.button(
+            "↩ Quitar de vistos",
+            key=f"catalogo_quitar_visto_{prefijo_key}_{id_kdrama}",
+            help="Quita esta serie de Mis KDramas Vistos.",
+            width="stretch"
+        ):
+            actualizar_visto(
+                id_kdrama=id_kdrama,
+                titulo=titulo,
+                poster=poster,
+                visto=False
+            )
+
+            st.session_state.mensaje_toast = f"Quitaste '{titulo}' de tus KDramas vistos."
+            st.rerun()
     else:
+        if st.button(
+            "✓ Marcar como vista",
+            key=f"catalogo_visto_{prefijo_key}_{id_kdrama}",
+            help="Agrega esta serie a Mis KDramas Vistos.",
+            width="stretch"
+        ):
+            actualizar_visto(
+                id_kdrama=id_kdrama,
+                titulo=titulo,
+                poster=poster,
+                visto=True
+            )
+
+            eliminar_por_ver(id_kdrama)
+            st.session_state.mensaje_toast = f"Agregaste '{titulo}' a tus KDramas vistos 💜"
+            st.session_state.pagina_pendiente = "✨ Mis KDramas Vistos"
+            st.rerun()
+
         if en_por_ver:
             if st.button(
                 "Quitar de Por Ver",
