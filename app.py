@@ -89,6 +89,12 @@ if 'mensaje_toast' in st.session_state:
 with st.sidebar:
     st.title("🐻 Tata")
     st.caption("Compañero oficial de JulyVerse 💜")
+    st.page_link(
+        "pages/animeverse.py",
+        label="Entrar a AnimeVerse",
+        icon="🌊",
+        width="stretch",
+    )
     if st.button("Cerrar sesión", icon=":material/logout:", width="stretch"):
         cerrar_sesion()
     st.write(
@@ -700,20 +706,26 @@ if pagina_actual == "💜 Para July":
     st.markdown(
         """
         <div class="animeverse-preview">
-            <span class="animeverse-eyebrow">PRÓXIMO UNIVERSO</span>
-            <div class="animeverse-title">🌸 AnimeVerse</div>
+            <span class="animeverse-eyebrow">NUEVO UNIVERSO</span>
+            <div class="animeverse-title">🌊 AnimeVerse</div>
             <p>
-                Un espacio separado para el catálogo, los vistos y las
-                recomendaciones de anime de July.
+                El puerto de entrada a un catálogo, historial y recomendaciones
+                de anime completamente separados.
             </p>
             <div class="animeverse-features">
-                <span>🎨 Fondo propio</span>
+                <span>🧭 Aventura propia</span>
                 <span>📺 Catálogo independiente</span>
-                <span>✨ Nuevas recomendaciones</span>
+                <span>💾 Datos separados</span>
             </div>
         </div>
         """,
         unsafe_allow_html=True
+    )
+    st.page_link(
+        "pages/animeverse.py",
+        label="Explorar AnimeVerse",
+        icon="🌊",
+        width="stretch",
     )
 
 # PESTAÑA 3: BUSCADOR MEJORADO (CON FORMULARIO)

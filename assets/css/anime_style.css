@@ -1,0 +1,261 @@
+:root {
+    --anime-navy: #061a2d;
+    --anime-ocean: #0b4f6c;
+    --anime-sky: #4ba3c7;
+    --anime-gold: #f3c969;
+    --anime-parchment: #fff1c9;
+    --anime-red: #b53a35;
+}
+
+html,
+body,
+[data-testid="stAppViewContainer"] {
+    background:
+        radial-gradient(circle at 18% 18%, rgba(75, 163, 199, 0.42), transparent 30%),
+        radial-gradient(circle at 82% 14%, rgba(243, 201, 105, 0.18), transparent 24%),
+        linear-gradient(165deg, #061a2d 0%, #0a3550 42%, #0b5d78 72%, #d6a95b 145%)
+        !important;
+}
+
+[data-testid="stAppViewContainer"]::before {
+    inset: 0;
+    opacity: 0.52;
+    background-image:
+        radial-gradient(circle, rgba(255, 241, 201, 0.92) 0 1px, transparent 2px),
+        radial-gradient(circle, rgba(255, 255, 255, 0.64) 0 1px, transparent 2px);
+    background-position: 18px 24px, 92px 78px;
+    background-size: 130px 110px, 170px 145px;
+    animation: anime-sky-drift 34s linear infinite;
+}
+
+[data-testid="stAppViewContainer"]::after {
+    content: "";
+    position: fixed;
+    right: -8vw;
+    bottom: -110px;
+    left: -8vw;
+    z-index: 0;
+    height: 245px;
+    pointer-events: none;
+    opacity: 0.34;
+    background:
+        radial-gradient(ellipse at 50% 0, transparent 52%, rgba(255, 255, 255, 0.44) 54% 57%, transparent 59%)
+        0 0 / 180px 72px repeat-x;
+    animation: anime-waves 12s ease-in-out infinite alternate;
+}
+
+[data-testid="stMain"] {
+    position: relative;
+    z-index: 1;
+}
+
+[data-testid="stSidebar"] {
+    border-right: 1px solid rgba(243, 201, 105, 0.28) !important;
+    background:
+        linear-gradient(165deg, rgba(255, 241, 201, 0.94), rgba(226, 196, 133, 0.90))
+        !important;
+}
+
+.anime-sidebar-brand {
+    display: grid;
+    margin: 6px 0 14px;
+    text-align: center;
+}
+
+.anime-sidebar-brand > span {
+    font-size: 34px;
+}
+
+.anime-sidebar-brand strong {
+    color: #17324a;
+    font-size: 24px;
+}
+
+.anime-sidebar-brand small {
+    color: #715230;
+}
+
+.anime-hero {
+    max-width: 920px;
+    margin: 28px auto 36px;
+    padding: clamp(28px, 5vw, 52px);
+    border: 1px solid rgba(255, 241, 201, 0.58);
+    border-radius: 34px;
+    background:
+        linear-gradient(145deg, rgba(6, 26, 45, 0.76), rgba(11, 79, 108, 0.62));
+    box-shadow: 0 24px 60px rgba(0, 8, 18, 0.30);
+    text-align: center;
+}
+
+.anime-hero-compass {
+    display: grid;
+    width: 64px;
+    height: 64px;
+    margin: 0 auto 14px;
+    place-items: center;
+    border: 2px solid rgba(255, 241, 201, 0.70);
+    border-radius: 50%;
+    background: rgba(243, 201, 105, 0.18);
+    color: var(--anime-gold);
+    font-size: 32px;
+    box-shadow: 0 0 28px rgba(243, 201, 105, 0.18);
+}
+
+.anime-hero-eyebrow,
+.anime-section-heading > span {
+    color: var(--anime-gold);
+    font-size: 11px;
+    font-weight: 850;
+    letter-spacing: 2px;
+}
+
+.anime-hero h1 {
+    margin: 5px 0 10px;
+    color: #fff4d5 !important;
+    font-size: clamp(44px, 8vw, 76px);
+    letter-spacing: -2px;
+}
+
+.anime-hero h1 > span:first-child,
+.anime-section-heading h2 > span:first-child {
+    color: #fff4d5 !important;
+}
+
+.anime-hero p {
+    max-width: 620px;
+    margin: 0 auto;
+    color: rgba(255, 247, 224, 0.88);
+    font-size: clamp(15px, 2vw, 18px);
+    line-height: 1.6;
+}
+
+.anime-hero-badges {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 9px;
+    margin-top: 24px;
+}
+
+.anime-hero-badges span {
+    padding: 7px 12px;
+    border: 1px solid rgba(255, 241, 201, 0.30);
+    border-radius: 999px;
+    background: rgba(6, 26, 45, 0.42);
+    color: #fff1c9;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.anime-section-heading {
+    max-width: 720px;
+    margin: 0 auto 20px;
+    text-align: center;
+}
+
+.anime-section-heading h2 {
+    margin: 4px 0 6px;
+    color: #fff4d5 !important;
+}
+
+.anime-section-heading p {
+    color: rgba(255, 247, 224, 0.78);
+}
+
+.anime-roadmap {
+    display: grid;
+    max-width: 1100px;
+    margin: 0 auto 24px;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 16px;
+}
+
+.anime-roadmap article {
+    min-height: 205px;
+    padding: 22px;
+    border: 1px solid rgba(255, 241, 201, 0.42);
+    border-radius: 24px;
+    background:
+        linear-gradient(155deg, rgba(255, 241, 201, 0.92), rgba(226, 196, 133, 0.82));
+    box-shadow: 0 14px 30px rgba(0, 8, 18, 0.18);
+}
+
+.anime-roadmap-icon {
+    margin-bottom: 12px;
+    font-size: 30px;
+}
+
+.anime-roadmap article strong {
+    display: block;
+    color: #17324a;
+    font-size: 17px;
+}
+
+.anime-roadmap article p {
+    min-height: 58px;
+    color: #604a36;
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+.anime-roadmap-status {
+    display: inline-flex;
+    padding: 5px 9px;
+    border-radius: 999px;
+    background: rgba(23, 50, 74, 0.10);
+    color: #41546a;
+    font-size: 10px;
+    font-weight: 850;
+    letter-spacing: 0.7px;
+}
+
+.anime-roadmap-status.active {
+    background: rgba(181, 58, 53, 0.12);
+    color: #9b2f2b;
+}
+
+@keyframes anime-sky-drift {
+    from {
+        transform: translate3d(0, 0, 0);
+    }
+    to {
+        transform: translate3d(130px, -110px, 0);
+    }
+}
+
+@keyframes anime-waves {
+    from {
+        transform: translate3d(-24px, 0, 0);
+    }
+    to {
+        transform: translate3d(24px, -12px, 0);
+    }
+}
+
+@media (max-width: 768px) {
+    .anime-hero {
+        margin-top: 18px;
+        padding: 28px 18px;
+        border-radius: 27px;
+    }
+
+    .anime-roadmap {
+        max-width: 390px;
+        grid-template-columns: 1fr;
+    }
+
+    .anime-roadmap article {
+        min-height: auto;
+    }
+
+    .anime-roadmap article p {
+        min-height: auto;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    [data-testid="stAppViewContainer"]::before,
+    [data-testid="stAppViewContainer"]::after {
+        animation: none;
+    }
+}
