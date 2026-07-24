@@ -1798,15 +1798,42 @@ div[class*="st-key-ocultar_recomendacion_"] button:hover p {
 
 .details-cast-grid {
     display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: repeat(4, minmax(0, 1fr));
     gap: 8px;
 }
 
 .details-cast-item {
+    display: flex;
+    align-items: center;
     padding: 10px 11px;
     border: 1px solid rgba(255, 255, 255, 0.58);
     border-radius: 14px;
     background: rgba(255, 255, 255, 0.40);
+    flex-direction: column;
+    text-align: center;
+}
+
+.details-cast-photo,
+.details-cast-placeholder {
+    width: 68px;
+    height: 68px;
+    margin-bottom: 7px;
+    border-radius: 50%;
+}
+
+[data-testid="stDialog"] .details-cast-photo {
+    border-radius: 50%;
+    object-fit: cover;
+    box-shadow: 0 5px 12px rgba(76, 29, 149, 0.16) !important;
+}
+
+.details-cast-placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid rgba(124, 58, 237, 0.14);
+    background: rgba(237, 233, 254, 0.74);
+    font-size: 24px;
 }
 
 .details-cast-item strong,

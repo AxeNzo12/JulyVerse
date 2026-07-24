@@ -215,6 +215,87 @@ with st.sidebar:
         except Exception as error:
             st.error("No pude leer el respaldo de Por Ver. Revisa que sea un archivo CSV válido.")
             st.caption(f"Detalle técnico: {error}")
+
+    st.markdown("#### 🙈 Restaurar preferencias")
+    st.caption("Selecciona el respaldo de recomendaciones ocultas.")
+
+    archivo_preferencias_respaldo = st.file_uploader(
+        "Respaldo de preferencias de recomendaciones",
+        type=["csv"],
+        key="archivo_preferencias_julyverse",
+        label_visibility="collapsed"
+    )
+
+    if archivo_preferencias_respaldo is not None:
+        try:
+            df_preferencias_importado = pd.read_csv(
+                archivo_preferencias_respaldo
+            )
+            columnas_preferencias = {"id", "titulo"}
+
+            if not columnas_preferencias.issubset(
+                df_preferencias_importado.columns
+            ):
+                st.error(
+                    "Este archivo no parece ser un respaldo válido "
+                    "de preferencias."
+                )
+            else:
+                st.caption(
+                    f"Se encontraron {len(df_preferencias_importado)} "
+                    "recomendaciones ocultas."
+                )
+                st.warning(
+                    "Restaurar este archivo reemplazará las preferencias "
+                    "actuales."
+                )
+
+                if st.button(
+                    "Restaurar preferencias",
+                    width="stretch"
+                ):
+                    df_preferencias_importado = df_preferencias_importado[
+                        ["id", "titulo"]
+                    ].copy()
+                    df_preferencias_importado["id"] = pd.to_numeric(
+                        df_preferencias_importado["id"],
+                        errors="coerce"
+                    )
+                    df_preferencias_importado = (
+                        df_preferencias_importado.dropna(subset=["id"])
+                    )
+                    df_preferencias_importado["id"] = (
+                        df_preferencias_importado["id"].astype(int)
+                    )
+                    df_preferencias_importado["titulo"] = (
+                        df_preferencias_importado["titulo"]
+                        .fillna("")
+                        .astype(str)
+                    )
+                    df_preferencias_importado = (
+                        df_preferencias_importado.drop_duplicates(
+                            subset=["id"],
+                            keep="first"
+                        )
+                    )
+                    df_preferencias_importado.to_csv(
+                        "no_me_interesan.csv",
+                        index=False
+                    )
+
+                    st.session_state.mensaje_toast = (
+                        "Preferencias restauradas correctamente 🙈"
+                    )
+                    st.session_state.pagina_pendiente = "💜 Para July"
+                    st.rerun()
+
+        except Exception as error:
+            st.error(
+                "No pude leer el respaldo de preferencias. "
+                "Revisa que sea un archivo CSV válido."
+            )
+            st.caption(f"Detalle técnico: {error}")
+
 if "bienvenida_actual" not in st.session_state:
     st.session_state.bienvenida_actual = obtener_bienvenida()
 

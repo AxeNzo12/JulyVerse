@@ -2,7 +2,11 @@ import html
 
 import streamlit as st
 
-from services.tmdb import IMG_URL_SMALL, obtener_perfil_kdrama
+from services.tmdb import (
+    IMG_URL_SMALL,
+    PROFILE_IMG_URL_SMALL,
+    obtener_perfil_kdrama,
+)
 
 
 ESTADOS_TMDB = {
@@ -126,15 +130,24 @@ def mostrar_detalles_kdrama(drama):
         st.markdown("#### La historia")
         st.write(descripcion)
 
-    reparto = perfil.get("aggregate_credits", {}).get("cast", [])[:6]
+    reparto = perfil.get("aggregate_credits", {}).get("cast", [])[:4]
 
     if reparto:
         reparto_html = ""
 
         for persona in reparto:
             nombre = persona.get("name", "Sin nombre")
+            foto = persona.get("profile_path", "")
             roles = persona.get("roles", []) or []
             personaje = roles[0].get("character", "") if roles else ""
+            nombre_seguro = _texto_seguro(nombre)
+            foto_html = (
+                '<img loading="lazy" class="details-cast-photo" '
+                f'src="{_texto_seguro(PROFILE_IMG_URL_SMALL + foto)}" '
+                f'alt="{nombre_seguro}">'
+                if foto
+                else '<div class="details-cast-placeholder">🎭</div>'
+            )
             texto_personaje = (
                 f"<span>{_texto_seguro(personaje)}</span>"
                 if personaje
@@ -142,7 +155,8 @@ def mostrar_detalles_kdrama(drama):
             )
             reparto_html += (
                 '<div class="details-cast-item">'
-                f'<strong>{_texto_seguro(nombre)}</strong>'
+                f"{foto_html}"
+                f'<strong>{nombre_seguro}</strong>'
                 f"{texto_personaje}</div>"
             )
 

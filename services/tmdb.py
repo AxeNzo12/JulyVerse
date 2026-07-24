@@ -4,6 +4,7 @@ import streamlit as st
 BASE_URL = "https://api.themoviedb.org/3"
 IMG_URL = "https://image.tmdb.org/t/p/w500"
 IMG_URL_SMALL = "https://image.tmdb.org/t/p/w200"
+PROFILE_IMG_URL_SMALL = "https://image.tmdb.org/t/p/w185"
 
 GENEROS_TMDB = {
     "Todos": "",
