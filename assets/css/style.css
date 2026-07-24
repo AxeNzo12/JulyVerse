@@ -15,6 +15,39 @@
     background: rgba(255,255,255,0.55);
     backdrop-filter: blur(12px);
 }
+
+/* El contenido lateral conserva su propio desplazamiento en nube y celular */
+[data-testid="stSidebarContent"] {
+    height: 100dvh !important;
+    max-height: 100dvh !important;
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+    overscroll-behavior: contain;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(124, 58, 237, 0.42) transparent;
+    -webkit-overflow-scrolling: touch;
+}
+
+[data-testid="stSidebarUserContent"] {
+    padding-bottom: 3rem;
+}
+
+[data-testid="stSidebarContent"]::-webkit-scrollbar {
+    width: 7px;
+}
+
+[data-testid="stSidebarContent"]::-webkit-scrollbar-thumb {
+    border-radius: 999px;
+    background: rgba(124, 58, 237, 0.38);
+}
+
+/* Reduce los controles técnicos nativos sin afectar el botón del sidebar */
+[data-testid="stToolbar"],
+[data-testid="stAppDeployButton"],
+[data-testid="stMainMenu"] {
+    display: none !important;
+}
+
     h1, h2, h3 { color: #4a044e !important; }
     
     /* Animación de rebote al darle clic a las casillas */
