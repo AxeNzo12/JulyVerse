@@ -372,7 +372,33 @@ div[role="radiogroup"] label:has(input:checked) p {
 
 @media (max-width: 650px) {
     div[role="radiogroup"] {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 7px;
+        padding: 6px;
+    }
+
+    div[class*="st-key-pagina_actual"] {
+        position: sticky;
+        top: 3.15rem;
+        z-index: 20;
+        margin: 0 -4px 10px;
+        border: 1px solid rgba(255, 255, 255, 0.58);
+        border-radius: 20px;
+        background: linear-gradient(
+            135deg,
+            rgba(234, 223, 255, 0.96),
+            rgba(218, 201, 250, 0.96)
+        );
+        box-shadow: 0 8px 18px rgba(76, 29, 149, 0.10);
+    }
+
+    div[role="radiogroup"] label {
+        min-height: 48px;
+        padding: 6px 5px;
+    }
+
+    div[role="radiogroup"] label p {
+        font-size: 12px;
     }
 }
 
@@ -638,6 +664,61 @@ div[data-testid="stForm"]:has(
     div[class*="st-key-FormSubmitter-formulario_busqueda"]
 ) [data-testid="stFormSubmitButton"] button p {
     color: white !important;
+}
+
+.search-results-count {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin: 8px 0 16px;
+    padding: 7px 12px;
+    border: 1px solid rgba(124, 58, 237, 0.16);
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.52);
+    color: #6b4e71;
+    font-size: 13px;
+}
+
+.search-results-count strong {
+    color: #5b21b6;
+    font-weight: 800;
+}
+
+.search-empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    max-width: 620px;
+    margin: 22px auto 8px;
+    padding: 28px 22px;
+    border: 1px solid rgba(255, 255, 255, 0.58);
+    border-radius: 24px;
+    background: rgba(255, 255, 255, 0.46);
+    text-align: center;
+}
+
+.search-empty-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    height: 48px;
+    margin-bottom: 11px;
+    border-radius: 50%;
+    background: rgba(237, 233, 254, 0.82);
+    font-size: 23px;
+}
+
+.search-empty-state strong {
+    color: #4a044e;
+    font-size: 18px;
+    font-weight: 800;
+}
+
+.search-empty-state span {
+    margin-top: 6px;
+    color: #6b4e71;
+    font-size: 14px;
 }
 
 /* Controles y tarjetas de Mis KDramas Vistos */
@@ -1646,13 +1727,52 @@ img:hover {
     [data-testid="stSidebar"] [data-testid="stImage"] img {
         display: block;
         width: auto !important;
-        max-width: 185px !important;
-        max-height: 210px;
+        max-width: 155px !important;
+        max-height: 175px;
         margin: 0 auto;
         object-fit: contain;
     }
 
     [data-testid="stSidebar"] .block-container {
-        padding-top: 1.25rem;
+        padding-top: 1rem;
+        padding-inline: 1rem;
+    }
+
+    [data-testid="stSidebar"] [data-testid="stVerticalBlock"] {
+        gap: 10px;
+    }
+
+    [data-testid="stSidebar"] [data-testid="stFileUploader"] {
+        margin-bottom: 0.6rem;
+    }
+
+    [data-testid="stSidebar"] [data-testid="stFileUploaderDropzone"] {
+        justify-content: center;
+        min-height: 60px;
+        padding: 8px;
+    }
+
+    [data-testid="stSidebar"]
+      [data-testid="stFileUploaderDropzoneInstructions"] {
+        display: none;
+    }
+
+    .search-results-count {
+        width: 100%;
+        justify-content: center;
+        box-sizing: border-box;
+        margin-bottom: 14px;
+    }
+
+    .search-empty-state {
+        margin-top: 16px;
+        padding: 24px 18px;
+    }
+
+    div[data-testid="stForm"]:has(
+        div[class*="st-key-FormSubmitter-formulario_busqueda"]
+    ) [data-testid="stFormSubmitButton"] button {
+        width: 100% !important;
+        min-width: 0;
     }
 }

@@ -230,6 +230,32 @@ if fecha_especial:
     )
 
 
+OPCIONES_PAGINA = [
+    "📺 Catálogo",
+    "🔍 Buscar Serie",
+    "✨ Mis KDramas Vistos",
+    "⭐ Favoritos",
+    "💫 Por Ver",
+    "📊 Estadísticas"
+]
+
+if "pagina_actual" not in st.session_state:
+    st.session_state.pagina_actual = "📺 Catálogo"
+
+# Si alguna acción pidió cambiar de página, lo hacemos ANTES de crear el radio
+if "pagina_pendiente" in st.session_state:
+    st.session_state.pagina_actual = st.session_state.pagina_pendiente
+    del st.session_state.pagina_pendiente
+
+pagina_actual = st.radio(
+    "Navegación",
+    OPCIONES_PAGINA,
+    horizontal=True,
+    key="pagina_actual",
+    label_visibility="collapsed"
+)
+
+
 # --- MEMORIA DE LA APLICACIÓN (SESSION STATE) ---
 if 'pagina_catalogo' not in st.session_state:
     st.session_state.pagina_catalogo = 1
@@ -357,31 +383,6 @@ mostrar_dashboard(
 mostrar_logros(logros_desbloqueados)
 
 
-OPCIONES_PAGINA = [
-    "📺 Catálogo",
-    "🔍 Buscar Serie",
-    "✨ Mis KDramas Vistos",
-    "⭐ Favoritos",
-    "💫 Por Ver",
-    "📊 Estadísticas"
-]
-
-if "pagina_actual" not in st.session_state:
-    st.session_state.pagina_actual = "📺 Catálogo"
-
-# Si alguna acción pidió cambiar de página, lo hacemos ANTES de crear el radio
-if "pagina_pendiente" in st.session_state:
-    st.session_state.pagina_actual = st.session_state.pagina_pendiente
-    del st.session_state.pagina_pendiente
-
-pagina_actual = st.radio(
-    "Navegación",
-    OPCIONES_PAGINA,
-    horizontal=True,
-    key="pagina_actual",
-    label_visibility="collapsed"
-)
-
 # PESTAÑA 1: CATÁLOGO POPULAR
 if pagina_actual == "📺 Catálogo":
     if st.session_state.pop("subir_catalogo", False):
@@ -460,12 +461,40 @@ if pagina_actual == "🔍 Buscar Serie":
 
     # Mostramos los resultados
     if st.session_state.resultados_busqueda:
+        cantidad_resultados = len(st.session_state.resultados_busqueda)
+        texto_resultados = (
+            "resultado encontrado"
+            if cantidad_resultados == 1
+            else "resultados encontrados"
+        )
+
+        st.markdown(
+            f"""
+            <div class="search-results-count">
+                <span>✨</span>
+                <strong>{cantidad_resultados}</strong> {texto_resultados}
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
+
         cols_busqueda = st.columns(4)
         for idx, res in enumerate(st.session_state.resultados_busqueda):
             with cols_busqueda[idx % 4]:
                 mostrar_tarjeta(res, "bus", lista_vistos_ids, lista_por_ver_ids)
     elif not st.session_state.resultados_busqueda and "busqueda" in locals() and busqueda:
-        st.info("No se encontraron resultados.")
+        busqueda_segura = html.escape(busqueda.strip())
+
+        st.markdown(
+            f"""
+            <div class="search-empty-state">
+                <div class="search-empty-icon">🔎</div>
+                <strong>No encontramos “{busqueda_segura}”</strong>
+                <span>Prueba con otro título o revisa cómo está escrito.</span>
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
 
 # PESTAÑA 3: LISTA PERSONAL CON MINIATURAS Y BOTÓN PARA QUITAR
 if pagina_actual == "✨ Mis KDramas Vistos":
